@@ -1,0 +1,160 @@
+[
+    {
+        "id": "steam",
+        "name": "Steam",
+        "hint": "Big Picture Mode",
+        "icon": "assets/icons/steam.svg",
+        "cmd": "flatpak",
+        "args": ["run", "com.valvesoftware.Steam", "-gamepadui", "-tenfoot"],
+        "accent": "#1a9fff",
+        "flathubId": "com.valvesoftware.Steam",
+        "nativeCmd": "steam",
+        "nativeArgs": ["-gamepadui", "-tenfoot"],
+        "common": true
+    },
+    {
+        "id": "heroic",
+        "name": "Heroic",
+        "hint": "Epic / GOG Games / Amazon",
+        "icon": "assets/icons/heroic.png",
+        "cmd": "flatpak",
+        "args": ["run", "com.heroicgameslauncher.hgl"],
+        "accent": "#ff6b3d",
+        "flathubId": "com.heroicgameslauncher.hgl",
+        "nativeCmd": "heroic",
+        "common": true
+    },
+    {
+        "id": "retroarch",
+        "name": "RetroArch",
+        "hint": "Emulators",
+        "icon": "assets/icons/retroarch.svg",
+        "cmd": "flatpak",
+        "args": ["run", "org.libretro.RetroArch"],
+        "accent": "#654a9c",
+        "flathubId": "org.libretro.RetroArch",
+        "nativeCmd": "retroarch",
+        "common": true
+    },
+    {
+        "id": "ryujinx",
+        "name": "Ryujinx",
+        "hint": "Switch emulator (Ryubing)",
+        "icon": "assets/icons/ryujinx.png",
+        "cmd": "flatpak",
+        "args": ["run", "io.github.ryubing.Ryujinx"],
+        "accent": "#4a90d9",
+        "flathubId": "io.github.ryubing.Ryujinx",
+        "nativeCmd": ["Ryujinx", "ryujinx"]
+    },
+    {
+        "id": "lutris",
+        "name": "Lutris",
+        "hint": "Game manager (Wine / native)",
+        "icon": "assets/icons/lutris.png",
+        "cmd": "flatpak",
+        "args": ["run", "net.lutris.Lutris"],
+        "accent": "#e8843c",
+        "flathubId": "net.lutris.Lutris",
+        "nativeCmd": "lutris"
+    },
+    {
+        "id": "dolphin",
+        "name": "Dolphin",
+        "hint": "GameCube / Wii emulator",
+        "icon": "assets/icons/dolphin.png",
+        "cmd": "flatpak",
+        "args": ["run", "org.DolphinEmu.dolphin-emu"],
+        "accent": "#4b6cb7",
+        "flathubId": "org.DolphinEmu.dolphin-emu",
+        "nativeCmd": "dolphin-emu"
+    },
+    {
+        "id": "ppsspp",
+        "name": "PPSSPP",
+        "hint": "PSP emulator",
+        "icon": "assets/icons/ppsspp.png",
+        "cmd": "flatpak",
+        "args": ["run", "org.ppsspp.PPSSPP"],
+        "accent": "#3a7bd5",
+        "flathubId": "org.ppsspp.PPSSPP",
+        "nativeCmd": ["PPSSPPSDL", "PPSSPPQt", "ppsspp"]
+    },
+    {
+        "id": "duckstation",
+        "name": "DuckStation",
+        "hint": "PlayStation 1 emulator",
+        "icon": "assets/icons/duckstation.png",
+        "cmd": "flatpak",
+        "args": ["run", "org.duckstation.DuckStation"],
+        "accent": "#f2c14e",
+        "flathubId": "org.duckstation.DuckStation",
+        "nativeCmd": ["duckstation-qt", "duckstation"]
+    },
+    {
+        "id": "pcsx2",
+        "name": "PCSX2",
+        "hint": "PlayStation 2 emulator",
+        "icon": "assets/icons/pcsx2.png",
+        "cmd": "flatpak",
+        "args": ["run", "net.pcsx2.PCSX2"],
+        "accent": "#5c94c8",
+        "flathubId": "net.pcsx2.PCSX2",
+        "nativeCmd": ["pcsx2-qt", "pcsx2"]
+    },
+    {
+        "id": "rpcs3",
+        "name": "RPCS3",
+        "hint": "PlayStation 3 emulator",
+        "icon": "assets/icons/rpcs3.png",
+        "cmd": "flatpak",
+        "args": ["run", "net.rpcs3.RPCS3"],
+        "accent": "#3fae6b",
+        "flathubId": "net.rpcs3.RPCS3",
+        "nativeCmd": "rpcs3"
+    },
+    {
+        "id": "cemu",
+        "name": "Cemu",
+        "hint": "Wii U emulator",
+        "icon": "assets/icons/cemu.png",
+        "cmd": "flatpak",
+        "args": ["run", "info.cemu.Cemu"],
+        "accent": "#3aa9d8",
+        "flathubId": "info.cemu.Cemu",
+        "nativeCmd": ["cemu", "Cemu"]
+    },
+    {
+        "id": "melonds",
+        "name": "melonDS",
+        "hint": "Nintendo DS emulator",
+        "icon": "assets/icons/melonds.png",
+        "cmd": "flatpak",
+        "args": ["run", "net.kuribo64.melonDS"],
+        "accent": "#e05a4a",
+        "flathubId": "net.kuribo64.melonDS",
+        "nativeCmd": ["melonDS", "melonds"]
+    },
+    {
+        "id": "prismlauncher",
+        "name": "Prism Launcher",
+        "hint": "Minecraft",
+        "icon": "assets/icons/prismlauncher.png",
+        "cmd": "flatpak",
+        "args": ["run", "org.prismlauncher.PrismLauncher"],
+        "accent": "#2aa876",
+        "flathubId": "org.prismlauncher.PrismLauncher",
+        "nativeCmd": "prismlauncher"
+    },
+    {
+        "id": "bottles",
+        "name": "Bottles",
+        "hint": "Windows apps / games",
+        "icon": "assets/icons/bottles.png",
+        "cmd": "flatpak",
+        "args": ["run", "com.usebottles.bottles"],
+        "accent": "#c5657f",
+        "flathubId": "com.usebottles.bottles",
+        "nativeCmd": "bottles"
+    }
+]

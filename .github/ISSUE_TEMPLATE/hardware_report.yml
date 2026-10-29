@@ -1,0 +1,17 @@
+name: Hardware report
+description: It works (or not) on your TV, controller or distro — helps the compatibility notes
+labels: [hardware]
+body:
+  - type: input
+    id: system
+    attributes:
+      label: Distro, desktop, session
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What you tried and what happened
+      description: "TV power-on over CEC, controller type, monitor switching, GPU acceleration (Diagnostics shows `gpu_compositing`), …"
+    validations:
+      required: true

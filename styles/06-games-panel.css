@@ -1,0 +1,404 @@
+/* styles/06-games-panel.css — Games panel: full-screen panel, search bar, source filter, cover grid, lists, "Recently played" row.
+   The styles/NN-*.css files load in NUMERIC ORDER in index.html (test/contracts/css-links.test.js). */
+/* --- Games panel: cover grid --- */
+/* Full-screen panel — fills the display edge to edge, no border/rounding/shadow/dimmed margin, like the home screen. */
+#gamesOverlay .settings-panel {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Live search bar: under the chip row, STICKY — what we search for stays visible even when scrolling a long result list. A fixed, full
+   background (paints over the cells). */
+.games-search {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: baseline;
+    gap: 0.8em;
+    flex: 0 0 auto;
+    padding: 0.45em 0.8em;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: var(--surface);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+}
+
+/* The flatpak emulator ROM folders the sandbox does not see */
+.games-rom-access-warn {
+    flex: 0 0 auto;
+    margin-bottom: 0.6em;
+    padding: 0.45em 0.8em;
+    border: 1px solid #ffb454;
+    border-radius: 4px;
+    background: var(--surface);
+    color: #ffb454;
+    font-size: 0.8rem;
+    word-break: break-all;
+}
+
+.games-rom-access-hint {
+    margin-top: 0.3em;
+    color: var(--text);
+    word-break: normal;
+}
+
+.games-search-text {
+    flex: 1;
+    min-width: 0;
+    color: var(--text);
+    word-break: break-all;
+}
+
+.games-search-meta {
+    flex: 0 0 auto;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+}
+
+/* Under the docked keyboard the panel's bottom padding is the measured keyboard height (--kb-h, set by `openGamesSearch` of
+   renderer/games-panel/games-panel-search.js), so the list stays ABOVE the keyboard. The panel's own hint row is hidden then (the keyboard
+   has its own hint). */
+#gamesOverlay.kb-docked .settings-panel {
+    padding-bottom: calc(1.5em + var(--kb-h, 0px));
+}
+
+#gamesOverlay.kb-docked #gamesPanelHint {
+    display: none;
+}
+
+/* Source filter chip row above the grid. L2/R2 switches; the active chip is highlighted, there is no separate focus cursor. */
+.games-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em;
+    flex: 0 0 auto;
+    padding-bottom: 2px;
+}
+
+.games-filter-chip {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 0.35em 0.85em;
+    border: 1px solid var(--dim);
+    border-radius: 999px;
+    color: var(--dim);
+}
+
+.games-filter-chip.active {
+    border-color: var(--accent);
+    background: rgba(0, 229, 255, 0.12);
+    color: var(--accent);
+}
+
+.games-grid {
+    /* Every card has an even margin around it, no overlap. The fullscreen panel (see `#gamesOverlay .settings-panel` above) gives much more
+           room, so the covers can be bigger too.
+           `flex: 0 0 auto` (NOT `flex: 1; min-height: 0; overflow-y: auto`) — the latter, in the "ALL" view with several `.games-retro-list`
+           sections NEXT TO the grid (each `flex: 0 0 auto`, NOT shrinking), squeezed the grid (the ONLY shrinking sibling) to 0 height whenever
+           the sections' total height exceeded the available room (the cards existed in the DOM, but nothing of them showed because of the 0 high
+           container — reproduced in production). With `flex: 0 0 auto` the grid takes its own natural height on equal terms with its siblings,
+           and `#gamesPanelContent` (`.settings-list`, `overflow-y: auto`) scrolls if it does not fit. */
+    --cover-w: clamp(120px, 15vh, 200px);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--cover-w), 1fr));
+    grid-auto-rows: auto;
+    gap: clamp(8px, 1.4vh, 16px);
+    flex: 0 0 auto;
+    align-content: start;
+}
+
+/* No `.games-retro-list` may stretch in the flex column of `#gamesPanelContent` — `#gamesPanelContent` scrolls the content-sized box as a
+   whole (see the "grid squeezed to 0 height" gotcha of the `.games-grid` comment above). It used to apply only through the
+   `.games-grid ~ .games-retro-list` sibling selector, which is NO LONGER ENOUGH since the uniform, cover-less list of the "ALL" view: there
+   is no `.games-grid` there, so the sibling selector matched neither list, both fell back to the inherited `flex:1` of `.settings-list`, and
+   the two flex:1 sections shared the room equally regardless of their content (a regression verified with an offscreen Electron test). So
+   the rule is unconditional. NO `max-height` / inner scrolling: like the cover grid, the list takes its natural height and
+   `#gamesPanelContent` scrolls as a whole. The windowed display of the "ALL" shared list (`unifiedSectionHtml`, inline padding) builds on
+   this too — inner scrolling would get in the way there. */
+.games-retro-list {
+    flex: 0 0 auto;
+    max-height: none;
+    overflow-y: visible;
+}
+
+.game-cell {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    align-self: start; /* the row height adapts to the tallest cell — this prevents stretching */
+    border: 2px solid transparent;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg);
+}
+/* NOTE: `content-visibility: auto` on `.game-cell` does NOT work — the fixed height of `contain-intrinsic-size` clashes with `aspect-ratio`.
+   `loading="lazy"` on the <img> solves the essential part (a cover outside the viewport is not loaded/decoded). */
+
+.game-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.game-cell-noart {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.7em;
+    font-size: 0.74rem;
+    line-height: 1.25;
+    color: var(--dim);
+    background: linear-gradient(160deg, var(--surface), var(--bg));
+}
+
+.game-cell.focused {
+    border-color: var(--accent);
+    box-shadow: var(--focus-shadow);
+    z-index: 3; /* the focus frame/shadow should paint over the neighboring cards */
+}
+
+.game-cell-title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1.3em 0.7em 0.5em;
+    font-size: 0.64rem;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    color: #fff;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.88));
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.game-cell.focused .game-cell-title {
+    color: var(--accent);
+}
+
+.game-cell-source {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.72);
+    color: #fff;
+}
+
+/* "★ Pinned" badge on the games-grid cell. Top-right corner. */
+.game-cell-pin {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.7rem;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.72);
+    color: var(--accent);
+}
+
+/* "Recently played" SUMMARY row at the TOP of the games panel's root view (max 10 items, from every launcher) — reuses the
+   .recent-game/.recent-game-noart pattern (see above, the quick-launch bar) with a smaller size clamp, so all 10 fit in one row across the
+   panel width, without scrolling. */
+.games-recent-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 1vh, 12px);
+    padding-bottom: clamp(10px, 1.6vh, 20px);
+}
+
+.games-recent-row .recent-game {
+    width: clamp(38px, 5.2vh, 72px);
+    height: clamp(57px, 7.8vh, 108px);
+    opacity: 0.55;
+}
+
+.games-recent-row.row-focused .recent-game {
+    opacity: 0.8;
+}
+
+.btn-triangle {
+    background: rgba(0, 229, 255, 0.15);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.btn-square {
+    background: rgba(255, 61, 110, 0.15);
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+}
+
+
+/* Game details view (renderer/games-panel/games-panel-details.js) — ABOVE the Games panel (because of the DOM order: same z-index, later
+   in the markup). The `.settings-panel` base rule is only extended narrowed by this id (many popups share the base). The cover follows the
+   2/3 ratio of the Games grid. */
+#gamesDetailsOverlay .settings-panel {
+    width: min(92vw, clamp(760px, 70.4vh, 1180px));
+}
+
+#gamesDetailsOverlay .settings-list {
+    flex: 0 1 auto;
+}
+
+.game-details {
+    display: flex;
+    gap: 1.4em;
+    align-items: flex-start;
+}
+
+.game-details-cover {
+    flex: 0 0 clamp(150px, 22vh, 320px);
+    aspect-ratio: 2 / 3;
+    border-radius: var(--card-radius, 6px);
+    overflow: hidden;
+    background: var(--bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+}
+
+.game-details-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.game-details-noart,
+.game-details-cover .recent-game-noart {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.8em;
+    font-size: 1rem;
+    color: var(--dim);
+}
+
+.game-details-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9em;
+}
+
+.game-details-source {
+    color: var(--dim);
+    font-size: 0.9rem;
+}
+
+.game-details-pin {
+    color: var(--accent);
+    margin-left: 0.6em;
+}
+
+.game-details-facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.5em 1.2em;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.game-details-facts dt {
+    color: var(--dim);
+}
+
+.game-details-facts dd {
+    margin: 0;
+    color: var(--text);
+    min-width: 0;
+}
+
+.game-details-path {
+    overflow-wrap: anywhere;
+    font-size: 0.85rem;
+}
+
+.game-details-note {
+    color: var(--dim);
+}
+
+.game-details-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+    margin-top: 1.2em;
+}
+
+/* Individually hidden game — only visible (dimmed) with "show hidden games". */
+.game-cell-hidden {
+    opacity: 0.45;
+}
+
+/* "NEW" badge on fresh, not yet launched games. */
+.game-cell-new {
+    position: absolute;
+    top: 0.3em;
+    left: 0.3em;
+    z-index: 2;
+    padding: 0.05em 0.4em;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--bg, #000);
+    background: var(--accent);
+    border-radius: 3px;
+}
+
+/* Game details: offline metadata — description (max 7 lines) + the Steam "hero" image as a blurred background. */
+.game-details-desc {
+    margin-top: 1em;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text);
+    opacity: 0.85;
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: pre-line;
+}
+
+.game-details-hero {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(clamp(10px, 1.6vh, 28px)) saturate(1.1);
+    opacity: 0.22;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#gamesDetailsContent {
+    position: relative;
+}
+
+#gamesDetailsContent > .game-details,
+#gamesDetailsContent > .game-details-actions {
+    position: relative;
+    z-index: 1;
+}

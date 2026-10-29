@@ -1,0 +1,92 @@
+Sink #57
+	State: SUSPENDED
+	Name: alsa_output.pci-0000_00_1b.0.analog-stereo
+	Description: Belső hangforrás Analóg sztereó
+	Driver: PipeWire
+	Sample Specification: s32le 2ch 48000Hz
+	Channel Map: front-left,front-right
+	Owner Module: 4294967295
+	Mute: no
+	Volume: front-left: 38666 /  59% / -13.75 dB,   front-right: 38666 /  59% / -13.75 dB
+	        balance 0.00
+	Base Volume: 65536 / 100% / 0.00 dB
+	Monitor Source: alsa_output.pci-0000_00_1b.0.analog-stereo.monitor
+	Latency: 0 usec, configured 0 usec
+	Flags: HARDWARE HW_MUTE_CTRL HW_VOLUME_CTRL DECIBEL_VOLUME LATENCY 
+	Properties:
+		alsa.card = "0"
+		alsa.card_name = "HDA Intel MID"
+		alsa.class = "generic"
+		alsa.components = "HDA:14f15069,17aa214c,00100302 HDA:80862804,17aa21b5,00100000"
+		alsa.device = "0"
+		alsa.driver_name = "snd_hda_intel"
+		alsa.id = "CX20585 Analog"
+		alsa.long_card_name = "HDA Intel MID at 0xf2620000 irq 31"
+		alsa.mixer_name = "Conexant CX20585"
+		alsa.name = "CX20585 Analog"
+		alsa.resolution_bits = "16"
+		alsa.subclass = "generic-mix"
+		alsa.subdevice = "0"
+		alsa.subdevice_name = "subdevice #0"
+		alsa.sync.id = "00000000:00000000:00000000:00000000"
+		api.alsa.card.longname = "HDA Intel MID at 0xf2620000 irq 31"
+		api.alsa.card.name = "HDA Intel MID"
+		api.alsa.path = "front:0"
+		api.alsa.pcm.card = "0"
+		api.alsa.pcm.stream = "playback"
+		audio.channels = "2"
+		audio.position = "FL,FR"
+		card.profile.device = "5"
+		device.api = "alsa"
+		device.class = "sound"
+		device.icon_name = "audio-card-analog"
+		device.id = "51"
+		device.profile.description = "Analóg sztereó"
+		device.profile.name = "analog-stereo"
+		device.routes = "2"
+		factory.name = "api.alsa.pcm.sink"
+		media.class = "Audio/Sink"
+		device.description = "Belső hangforrás"
+		node.name = "alsa_output.pci-0000_00_1b.0.analog-stereo"
+		node.nick = "CX20585 Analog"
+		node.pause-on-idle = "false"
+		object.path = "alsa:acp:MID:5:playback"
+		port.group = "playback"
+		priority.driver = "1009"
+		priority.session = "1009"
+		factory.id = "19"
+		clock.quantum-limit = "8192"
+		client.id = "47"
+		node.driver = "true"
+		node.loop.name = "data-loop.0"
+		library.name = "audioconvert/libspa-audioconvert"
+		object.id = "57"
+		object.serial = "REDACTED"
+		api.acp.auto-port = "false"
+		api.acp.auto-profile = "false"
+		api.alsa.card = "0"
+		api.alsa.split-enable = "true"
+		api.alsa.use-acp = "true"
+		api.dbus.ReserveDevice1 = "Audio0"
+		api.dbus.ReserveDevice1.Priority = "-20"
+		device.bus = "pci"
+		device.bus_path = "pci-0000:00:1b.0"
+		device.enum.api = "udev"
+		device.form_factor = "internal"
+		device.name = "alsa_card.pci-0000_00_1b.0"
+		device.nick = "HDA Intel MID"
+		device.plugged.usec = "9574353"
+		device.product.id = "0x3b56"
+		device.product.name = "5 Series/3400 Series Chipset High Definition Audio"
+		device.subsystem = "sound"
+		sysfs.path = "/devices/pci0000:00/0000:00:1b.0/sound/card0"
+		device.vendor.id = "0x8086"
+		device.vendor.name = "Intel Corporation"
+		spa.object.id = "2"
+		device.string = "0"
+	Ports:
+		analog-output-speaker: Hangszórók (type: Speaker, priority: 10000, availability group: Legacy 4, availability unknown)
+		analog-output-headphones: Fejhallgató (type: Headphones, priority: 9900, availability group: Legacy 5, not available)
+	Active Port: analog-output-speaker
+	Formats:
+		pcm

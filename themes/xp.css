@@ -1,0 +1,291 @@
+/* "Windows XP" (Luna blue) theme — a blue desktop, beige-silver panels, blue gradient title bars, a green Start button / progress, an orange
+   exit progress. An additive override above styles/*.css, every rule nested under :root[data-theme="xp"] (native CSS nesting) — only live
+   with <html data-theme="xp">.
+
+   Unlike win31.css there is NO `motion: "off"` in the manifest: XP had soft fades, the carousel slide stays. Font: Tahoma / Trebuchet MS
+   (the authentic XP system fonts) with a DejaVu Sans fallback — NO Google Fonts @import (like win31). */
+
+:root[data-theme="xp"] {
+    --bg: #1c53c4;
+    /* Luna blue desktop (loading overlay + solid fallback) */
+    --surface: #ece9d8;
+    /* classic XP window-client beige */
+    --accent: #2f6fd6;
+    /* Explorer selection blue — focus / title bar */
+    --accent2: #e07b18;
+    /* XP balloon orange — warning / exit progress */
+    --text: #1a1a1a;
+    --dim: #5c6470;
+    --running: #2f8a2f;
+    /* Start-button green ("● RUNNING" badge) */
+
+    --font-body: 'Tahoma', 'Verdana', 'DejaVu Sans', 'Segoe UI', sans-serif;
+    --font-display: 'Trebuchet MS', 'Tahoma', 'DejaVu Sans', sans-serif;
+
+    /* A solid blue selection border + a soft window shadow (not a neon glow). Because of the flat --focus-shadow the per-launcher --card-accent
+           glow is skipped automatically (like win31/oled). */
+    --focus-shadow: 0 0 0 2px var(--accent), 0 8px 20px rgba(10, 61, 145, 0.35);
+    --focus-shadow-danger: 0 0 0 2px var(--accent2), 0 8px 20px rgba(224, 123, 24, 0.3);
+
+    --scanline-opacity: 0;
+    --ambient: linear-gradient(180deg, #5a86e8 0%, #3f6fdc 45%, #2f5ecf 100%);
+    --card-radius: 8px;
+    /* XP rounded window corner */
+    --card-border: 1px solid #7ea6e0;
+    --corner-decor: none;
+    --card-bg-opacity: 0;
+    /* a flat beige panel — the blurred background icon would look "dirty" on it */
+
+    /* The iconic XP "Bliss" desktop: a freely licensed lookalike photo (Unsplash / Shibin Joseph, KvlCSWbsiR0 — a smooth green hill, a vivid
+           blue sky), in the themes/ folder so the theme stays a self-contained unit. The relative url() resolves relative to the stylesheet
+           (themes/); the CSP img-src 'self' file: allows it. A slight bluish scrim over the photo for the readability of the card hints / peek
+           arrows, the --ambient gradient is the final fallback if the image is missing. .bg-glow is position: fixed; inset: 0 anyway → cover +
+           center keeps the composition stable on a resolution change (TV mode) too. */
+    & .bg-glow {
+        background:
+            linear-gradient(180deg, rgba(12, 42, 96, 0.14) 0%, rgba(12, 42, 96, 0.26) 100%),
+            url("xp-bliss.jpg") center center / cover no-repeat,
+            var(--ambient);
+    }
+
+    & .header h1 {
+        font-weight: 700;
+        font-size: clamp(1.8rem, 4.4vh, 4rem);
+        letter-spacing: 0.12em;
+        background: none;
+        -webkit-text-fill-color: #ffffff;
+        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+    }
+
+    & .header .sub {
+        letter-spacing: 0.3em;
+        color: #eef4ff;
+        text-shadow: 0 1px 3px rgba(0, 20, 60, 0.55);
+    }
+
+    /* Card = XP window: a slight light→beige gradient client area, a soft outer shadow. The radius/border come from tokens. */
+    & .card {
+        --card-accent: var(--accent) !important;
+        background: linear-gradient(180deg, #ffffff 0%, #f2efe4 14%, #e6e2d2 100%);
+        box-shadow: 0 4px 14px rgba(0, 30, 90, 0.28);
+    }
+
+    & .card.focused {
+        border-color: var(--accent);
+        box-shadow: var(--focus-shadow);
+    }
+
+    & .card.focused .card-icon svg {
+        filter: none;
+    }
+
+    & .card.focused .card-icon::after {
+        border-color: var(--accent);
+    }
+
+    & .card.focused .app-icon {
+        filter: none;
+    }
+
+    /* Card name: an XP blue gradient title bar stripe when focused */
+    & .card-name {
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--text);
+    }
+
+    & .card.focused .card-name {
+        color: #ffffff;
+        background: linear-gradient(180deg, #3f8ef3 0%, #0a5ad4 50%, #0846b8 100%);
+        border-radius: 5px;
+        padding: 3px 14px;
+    }
+
+    & .card-hint,
+    & .card .press-hint {
+        color: var(--dim);
+        letter-spacing: 0.06em;
+    }
+
+    /* Taskbar */
+    & .bottom-bar {
+        background: linear-gradient(to top, #245edb 0%, #4a8cf0 100%);
+        border-top: 1px solid #7ba2e0;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        color: #eef4ff;
+        letter-spacing: 0.06em;
+    }
+
+    & .btn-icon {
+        border-radius: 6px;
+        border-width: 1px;
+        border-style: solid;
+        font-family: 'Trebuchet MS', 'Tahoma', sans-serif;
+    }
+
+    & .btn-x,
+    & .btn-triangle {
+        background: linear-gradient(180deg, #5aa3f5, #2f6fd6);
+        color: #ffffff;
+        border-color: #1c53c4;
+    }
+
+    /* A green "Start button" mood on the back/cancel buttons */
+    & .btn-ps,
+    & .btn-square {
+        background: linear-gradient(180deg, #7ec860, #3c8f3c);
+        color: #ffffff;
+        border-color: #2f7a2f;
+    }
+
+    & .status {
+        color: #eef4ff;
+        letter-spacing: 0.1em;
+    }
+
+    & .status.error {
+        color: #ffd9c0;
+    }
+
+    /* Settings icon + panel = XP windows */
+    & .settings-icon-btn {
+        background: linear-gradient(180deg, #ffffff, #ece9d8);
+        border: 1px solid #7ea6e0;
+        border-radius: 6px;
+    }
+
+    & .settings-icon-btn svg {
+        fill: var(--text);
+    }
+
+    & .settings-icon-btn .audio-current-name {
+        color: var(--text);
+    }
+
+    & .settings-overlay {
+        background: rgba(10, 40, 100, 0.45);
+    }
+
+    & .settings-panel {
+        background: #ece9d8;
+        border: 1px solid #0831d9;
+        border-radius: 8px 8px 6px 6px;
+        box-shadow: 0 24px 60px rgba(0, 20, 70, 0.5);
+    }
+
+    & .settings-panel-title {
+        letter-spacing: 0.06em;
+        color: #ffffff;
+        background: linear-gradient(180deg, #3f8ef3 0%, #0a5ad4 50%, #0846b8 100%);
+        padding: 5px 12px;
+        text-align: left;
+        border-radius: 6px 6px 0 0;
+    }
+
+    & .settings-list {
+        background: #ffffff;
+        border: 1px solid #b7b19e;
+        padding: 4px;
+    }
+
+    & .settings-item {
+        border-radius: 4px;
+        border: 1px solid transparent;
+        background: #ffffff;
+        color: var(--text);
+        letter-spacing: 0.03em;
+    }
+
+    & .settings-item.focused {
+        border-color: transparent;
+        background: linear-gradient(180deg, #4a92f0, #2f6fd6);
+        color: #ffffff;
+    }
+
+    & .settings-item.grabbed {
+        border: 1px dotted #ffffff;
+        background: #316ac5;
+        color: #ffffff;
+        transform: none;
+    }
+
+    & .settings-item.focused .bt-icon,
+    & .settings-item.focused .bt-disamb,
+    & .settings-item.focused .audio-current-tag,
+    & .settings-item.focused .tag-warn {
+        color: #ffffff;
+    }
+
+    & .settings-subhead {
+        color: var(--accent);
+        letter-spacing: 0.05em;
+    }
+
+    & .settings-item-readonly {
+        opacity: 0.6;
+    }
+
+    & .settings-panel-hint {
+        color: var(--text);
+    }
+
+    & .game-cell.focused,
+    & .recent-game.focused {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    /* Overlays */
+    & .loading-overlay {
+        background: var(--bg);
+    }
+
+    & .loading-text {
+        color: #eef4ff;
+        letter-spacing: 0.1em;
+    }
+
+    & .volume-overlay {
+        border-radius: 8px;
+        border: 1px solid #0831d9;
+        background: #ece9d8;
+    }
+
+    & .volume-label,
+    & .volume-percent {
+        color: var(--text);
+    }
+
+    & .volume-track {
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.15);
+        border: 1px solid #b7b19e;
+    }
+
+    & .volume-fill {
+        background: linear-gradient(180deg, #5aa3f5, #2f6fd6);
+        box-shadow: none;
+    }
+
+    & .exit-progress-label {
+        color: #ffffff;
+        letter-spacing: 0.05em;
+    }
+
+    & .exit-progress-track {
+        background: rgba(255, 255, 255, 0.25);
+        border: 1px solid #1c53c4;
+    }
+
+    & .exit-progress-fill {
+        background: linear-gradient(180deg, #f0a24a, #e07b18);
+        box-shadow: none;
+    }
+
+    & .exit-label {
+        letter-spacing: 0.04em;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        background: rgba(10, 60, 150, 0.6);
+    }
+}

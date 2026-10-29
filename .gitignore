@@ -1,0 +1,28 @@
+# The launcher writes nothing into the repo AT RUNTIME. The machine-specific config is
+# ~/.config/launchers-launcher/config.json, logs + sidecar files live under ~/.local/share/
+# (see README "Local state"). This list only catches developer / accidental junk.
+
+# dependencies
+node_modules/
+
+# logs (the launcher writes to ~/.local/share/; this only guards against a stray .log in the repo)
+*.log
+
+# local env / secrets
+.env
+
+# editor / OS
+*~
+*.swp
+.DS_Store
+
+# Old machine-specific root JSONs: lib/config.js migrateFromLegacy() copies their content ONCE
+# into ~/.config/launchers-launcher/config.json, after that they are no longer read (the old files
+# are NOT deleted). They do not exist in a fresh clone; this only covers leftovers on a dev machine.
+launcher-order.json
+launchers-custom.json
+display-config.json
+theme-config.json
+
+# Claude Code local settings (machine-specific permissions)
+.claude/

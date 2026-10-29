@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Launchers Launcher</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo/logo.svg">
+    <!-- Icons are local (assets/icons/), fonts come from the Google Fonts CDN (@import at the top of
+             styles/01-base.css / themes/*.css). `file:` is needed for local resources (the file:// origin
+             does not always match 'self' in CSP); the point is that Google Fonts is the only allowed
+             remote source, every other external load is blocked. -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' file:; script-src 'self' file:; style-src 'self' 'unsafe-inline' file: https://fonts.googleapis.com; font-src 'self' file: https://fonts.gstatic.com; img-src 'self' file: data:; connect-src 'self'">
+    <!-- The base styles (the `neon` theme) in topical files, in NUMERIC ORDER (the cascade order
+             matters — test/contracts/css-links.test.js). -->
+    <link rel="stylesheet" href="styles/01-base.css">
+    <link rel="stylesheet" href="styles/02-home.css">
+    <link rel="stylesheet" href="styles/03-status.css">
+    <link rel="stylesheet" href="styles/04-panels.css">
+    <link rel="stylesheet" href="styles/05-keyboard.css">
+    <link rel="stylesheet" href="styles/06-games-panel.css">
+    <link rel="stylesheet" href="styles/07-screen-overlays.css">
+    <link rel="stylesheet" href="styles/08-boot-splash.css">
+    <!-- Theme overrides (themes/<id>.css): renderer/main.js injects the <link> of the non-'neon' themes
+             at runtime (injectThemeLinks, from the manifest). To avoid a flash of the default (neon) theme
+             at startup, renderer/boot/boot-theme.js sets the ACTIVE theme's data-theme attribute + <link> +
+             background before the first paint — from the preload's synchronous `initialTheme` /
+             `initialBackground` (`get-boot-state`). Idempotent with the later applyTheme / applyBackground
+             calls of renderer/main.js / renderer/ipc.js. -->
+    <style id="__bootBg"></style>
+    <script src="renderer/boot/boot-theme.js"></script>
+</head>
+
+<body>
+
+    <!-- Startup splash (renderer/boot/boot-splash.js + styles/08-boot-splash.css): the logo's "lift-off from the controller" animation.
+             Pure CSS/SVG, zero JS for the animation itself; covers everything until #cards got the real launchers AND the animation
+             finished. The camera follows the rocket up: the controller (the "world") slides out at the bottom, and the rocket ends
+             as the logo with the lettering to its right. The BASE style is that final frame (data-motion="off" kills the animations
+             -> a static logo). Theme-independent colors on purpose — the theme is not necessarily applied at the first paint. -->
+    <div class="boot-splash" id="bootSplash" aria-hidden="true">
+        <svg class="boot-splash-art" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet">
+            <g class="sp-stars" fill="#39C6E8" opacity="0.55"><circle cx="70" cy="60" r="3" /><circle cx="210" cy="150" r="2" /><circle cx="120" cy="330" r="2.5" /><circle cx="60" cy="520" r="2" /><circle cx="300" cy="650" r="2" /><circle cx="480" cy="90" r="2" /><circle cx="760" cy="50" r="3" /><circle cx="980" cy="130" r="2" /><circle cx="1180" cy="70" r="2.5" /><circle cx="1230" cy="300" r="2" /><circle cx="1120" cy="470" r="3" /><circle cx="1210" cy="640" r="2" /><circle cx="900" cy="680" r="2" /><circle cx="620" cy="640" r="2.5" /></g>
+            <g class="sp-lines" stroke="#39C6E8" stroke-width="5" stroke-linecap="round"><line x1="150" y1="60" x2="150" y2="106" /><line x1="200" y1="140" x2="200" y2="186" /><line x1="470" y1="90" x2="470" y2="136" /><line x1="492" y1="200" x2="492" y2="246" /></g>
+            <!-- The "world": the controller + the smoke, in the design's coordinates (Liftoff.dc.html) — CSS places it on the stage. -->
+            <g class="sp-world">
+                <g class="sp-controller">
+                    <g transform="translate(170 386) scale(1.7)">
+                        <path d="M60 20 L140 20 C175 20 192 45 198 80 C204 115 196 132 180 132 C165 132 158 117 148 104 L52 104 C42 117 35 132 20 132 C4 132 -4 115 2 80 C8 45 25 20 60 20 Z" fill="#E9ECF5" />
+                        <path d="M148 104 L52 104 C42 117 35 132 20 132 C12 132 6 128 3 120 C10 124 18 124 26 118 C34 110 40 98 52 96 L148 96 C160 98 166 110 174 118 C182 124 190 124 197 120 C194 128 188 132 180 132 C165 132 158 117 148 104 Z" fill="#9AA3BF" />
+                        <ellipse class="sp-glow" cx="55" cy="61" rx="30" ry="26" fill="#FF7A1A" opacity="0.28" />
+                        <ellipse class="sp-glow" cx="55" cy="61" rx="22" ry="19" fill="#FF7A1A" opacity="0.35" />
+                        <rect x="35" y="53.5" width="40" height="15" rx="4" fill="#0E1120" />
+                        <rect x="47.5" y="41" width="15" height="40" rx="4" fill="#0E1120" />
+                        <circle cx="150" cy="46" r="7" fill="#39C6E8" /><circle cx="150" cy="76" r="7" fill="#FF7A1A" />
+                        <circle cx="135" cy="61" r="7" fill="#0E1120" /><circle cx="165" cy="61" r="7" fill="#0E1120" />
+                        <rect x="94" y="57" width="12" height="7" rx="3.5" fill="#0E1120" />
+                        <rect x="111" y="57" width="12" height="7" rx="3.5" fill="#0E1120" />
+                    </g>
+                </g>
+                <g class="sp-puffs">
+                    <circle cx="213.5" cy="469.7" r="11" fill="#5B6383" /><circle cx="313.5" cy="469.7" r="11" fill="#5B6383" />
+                    <circle cx="231.5" cy="457.7" r="15" fill="#C9CEDD" /><circle cx="295.5" cy="457.7" r="15" fill="#C9CEDD" />
+                </g>
+            </g>
+            <!-- The rocket in its own coordinate system (the logo's 240x240 design): the CSS transform moves/scales it from the pad
+                 (start) to the logo position (final = the base style). The flame lives inside it (the exhaust grows from the tail:
+                 long during the climb, short at the end — the logo's flame); the design's long-flame path data via the inverse of
+                 the Liftoff frame's `translate(155.5 157) scale(0.9)`. -->
+            <g class="sp-rocket">
+                <g class="sp-shake">
+                    <g class="sp-flame">
+                        <g class="sp-flame-flick">
+                            <g transform="scale(1.1111) translate(-155.5 -157)">
+                                <path d="M243.5 327.8 C241.5 398.855 255.5 454.12 263.5 485.7 C271.5 454.12 285.5 398.855 283.5 327.8 Z" fill="#FF7A1A" />
+                                <path d="M252.5 327.8 C251.5 390.96 259.5 425.698 263.5 446.225 C267.5 425.698 275.5 390.96 274.5 327.8 Z" fill="#FFC94A" />
+                            </g>
+                        </g>
+                    </g>
+                    <path d="M120 22 C134 36 140 56 140 76 L140 110 L182 110 Q190 110 190 118 L190 142 Q190 150 182 150 L140 150 L140 184 Q140 192 132 192 L108 192 Q100 192 100 184 L100 150 L58 150 Q50 150 50 142 L50 118 Q50 110 58 110 L100 110 L100 76 C100 56 106 36 120 22 Z" fill="#E9ECF5" />
+                    <circle cx="120" cy="130" r="9" fill="#0E1120" />
+                    <path d="M68 121 L59 130 L68 139 Z" fill="#0E1120" />
+                    <path d="M172 121 L181 130 L172 139 Z" fill="#0E1120" />
+                    <path d="M111 176 L120 184 L129 176 Z" fill="#0E1120" />
+                    <circle cx="120" cy="78" r="11" fill="#39C6E8" />
+                    <circle cx="120" cy="78" r="5" fill="#0E1120" />
+                </g>
+            </g>
+            <!-- "LAUNCHERS" / "LAUNCHER" to the right of the rocket — letters converted to paths (no font / network dependency at the
+                 first paint); the group transform = the Liftoff design's text coordinates -> the stage. -->
+            <g transform="translate(508 262) scale(1.9) translate(-181.6 -659)">
+                <path class="sp-text sp-text-1" fill="#E9ECF5" d="M181.61 659.2H187.594V684.94H202.994V690.0H181.61Z M217.918 659.2H223.374L234.638 690.0H228.566L226.058 683.18H215.234L212.726 690.0H206.654ZM224.738 678.252 220.646 666.548H220.558L216.597 678.252Z M240.718 684.72V659.2H246.702V682.652L248.946 684.896H257.57L259.814 682.652V659.2H265.798V684.72L260.518 690.0H245.998Z M274.518 659.2H279.886L293.614 680.1H293.702V659.2H299.466V690.0H294.098L280.37 669.144H280.282V690.0H274.518Z M307.746 684.94V664.26L312.806 659.2H327.854L332.826 664.172V668.88H326.842V666.372L324.774 664.304H315.974L313.73 666.548V682.652L315.974 684.896H324.774L326.842 682.828V680.32H332.826V685.028L327.854 690.0H312.806Z M340.006 659.2H345.99V672.092H359.014V659.2H364.998V690.0H359.014V677.196H345.99V690.0H340.006Z M373.718 659.2H395.982V664.26H379.702V672.048H394.706V677.02H379.702V684.94H395.982V690.0H373.718Z M427.582 679.792V690.0H421.598V681.156L418.957 678.208H409.366V690.0H403.382V659.2H422.698L427.406 663.952V673.28L424.414 676.316ZM409.366 673.28H419.969L421.51 671.74V665.756L419.969 664.216H409.366Z M435.421 685.248V680.848H441.318V683.444L442.77 684.896H451.878L453.373 683.4V678.296L451.921 676.844H440.262L435.51 672.092V663.952L440.262 659.2H454.166L458.918 663.952V668.396H453.022V665.756L451.57 664.304H442.858L441.406 665.756V670.288L442.858 671.74H454.518L459.27 676.492V685.16L454.429 690.0H440.174Z" />
+                <path class="sp-text sp-text-2" fill="#FF7A1A" d="M197.124 707.2H203.108V732.94H218.508V738.0H197.124Z M233.432 707.2H238.888L250.152 738.0H244.08L241.572 731.18H230.748L228.24 738.0H222.168ZM240.252 726.252 236.16 714.548H236.072L232.112 726.252Z M256.232 732.72V707.2H262.216V730.652L264.460 732.896H273.084L275.328 730.652V707.2H281.312V732.72L276.032 738.0H261.512Z M290.032 707.2H295.400L309.128 728.1H309.216V707.2H314.98V738.0H309.612L295.884 717.144H295.796V738.0H290.032Z M323.260 732.94V712.26L328.320 707.2H343.368L348.340 712.172V716.88H342.356V714.372L340.288 712.304H331.488L329.244 714.548V730.652L331.488 732.896H340.288L342.356 730.828V728.32H348.340V733.028L343.368 738.0H328.320Z M355.520 707.2H361.504V720.092H374.528V707.2H380.512V738.0H374.528V725.196H361.504V738.0H355.520Z M389.232 707.2H411.496V712.26H395.216V720.048H410.22V725.02H395.216V732.94H411.496V738.0H389.232Z M443.096 727.792V738.0H437.112V729.156L434.472 726.208H424.88V738.0H418.896V707.2H438.212L442.92 711.952V721.28L439.928 724.316ZM424.88 721.28H435.484L437.024 719.74V713.756L435.484 712.216H424.88Z" />
+            </g>
+        </svg>
+    </div>
+
+    <div class="bg-glow"></div>
+    <!-- Custom / built-in background image layer ABOVE .bg-glow (applyBackground() in
+             renderer/settings/settings-background.js; the mandatory scrim is #bgCustom.active::after). -->
+    <div id="bgCustom"></div>
+    <!-- Blurred cover of the focused Continue item (renderer/home/carousel.js updateContinueBackdrop). -->
+    <div id="continueBackdrop"></div>
+
+    <!-- Global error overlay (renderer/errors.js): a thrown renderer error brings it up; the ✕/○ choice
+             is handled by a watcher INDEPENDENT of the main pollGamepad. The inline style is the
+             failsafe — readable even if styles/*.css failed to load. Static text (tr() may be the
+             broken link). -->
+    <div class="fatal-overlay" id="fatalOverlay"
+        style="display:none;position:fixed;inset:0;z-index:400;background:#0a0a0f;color:#e8e8ee;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;padding:2rem;text-align:center">
+        <div style="font-size:1.4rem;font-weight:700;letter-spacing:.04em">ERROR</div>
+        <div style="opacity:.6;font-size:.85rem">Something went wrong — the launcher can reload or quit</div>
+        <pre class="fatal-overlay-message" id="fatalOverlayMessage"
+            style="max-width:60rem;max-height:40vh;overflow:auto;white-space:pre-wrap;font-size:.8rem;opacity:.8;margin:0"></pre>
+        <div class="fatal-overlay-meta" id="fatalOverlayMeta" style="opacity:.5;font-size:.8rem;min-height:1em"></div>
+        <div style="display:flex;gap:2rem;font-size:.95rem">
+            <span><span class="btn-icon btn-x">✕</span> Reload</span>
+            <span><span style="opacity:.7">○</span> / <span class="btn-icon btn-ps">PS</span> Quit</span>
+        </div>
+    </div>
+
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <!-- First-use tip bubble (renderer/home/tips.js). -->
+    <div class="tip-bubble" id="tipBubble" role="status" hidden><span id="tipBubbleText"></span></div>
+    <!-- Screen-reader announcement: the focused element's label when `feedback.screenReader` is on
+             (renderer/a11y.js). Invisible. -->
+    <div class="sr-only" id="srAnnounce" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Safe-mode bar (lib/safe-mode.js) — shown by renderer/main.js applyStaticLabels() when the
+             boot state reports `safeMode`. -->
+    <div class="safe-mode-banner" id="safeModeBanner" hidden></div>
+
+    <!-- Discreet clock in the top-right corner (only visible on the home screen: covered by the idle
+             overlay when idle, the launcher is hidden while playing). renderer/util.js tickClock(). -->
+    <div class="clock" id="clock">
+        <span class="clock-time"></span>
+        <span class="clock-date"></span>
+    </div>
+
+    <!-- Home-screen controller badge: every connected controller separately, with a type-specific
+             icon + battery % (below the header clock). renderer/controller/controller-status.js. -->
+    <div class="controller-status" id="controllerStatus" hidden></div>
+
+    <!-- "No controller" hint: appears after ~3 s without a pad, disappears on the first connection.
+             renderer/controller/controller-status.js. -->
+    <div class="no-pad-hint" id="noPadHint" hidden>
+        <span id="noPadHintText"></span>
+        <button type="button" class="no-pad-link" id="noPadHintLink"></button>
+        <button type="button" class="no-pad-close" id="noPadHintClose" aria-label="×">×</button>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <!-- When launching a game: its cover (sharp) + blurred as background — the `cover` parameter of
+                     renderer/overlays.js showLoading(); hidden when launching a launcher. -->
+        <img class="loading-cover-bg" id="loadingCoverBg" alt="" hidden>
+        <img class="loading-cover" id="loadingCover" alt="" hidden>
+        <div class="loading-text" id="loadingText">STARTING...</div>
+        <!-- Hold ○ = cancel the launch; the progress bar shows how far the hold is. -->
+        <div class="loading-cancel" id="loadingCancel">
+            <span id="loadingCancelText"></span>
+            <div class="loading-cancel-track"><div class="loading-cancel-fill" id="loadingCancelFill"></div></div>
+        </div>
+        <!-- Loader wave made of the active launchers' icons: filled by renderer/overlays.js
+                     showLoading() (launcherLoaderHtml). -->
+        <div id="loadingLoader"></div>
+    </div>
+
+    <div class="exit-progress" id="exitProgress">
+        <div class="exit-progress-label" id="exitProgressLabel">HOLD TO EXIT TV MODE</div>
+        <div class="exit-progress-track">
+            <div class="exit-progress-fill" id="exitProgressFill"></div>
+        </div>
+    </div>
+
+    <div class="exit-label" id="exitLabel">Shutting down</div>
+
+    <div class="volume-overlay" id="volumeOverlay">
+        <div class="volume-label" id="volumeLabel">Volume</div>
+        <div class="volume-track">
+            <div class="volume-fill" id="volumeFill"></div>
+        </div>
+        <div class="volume-percent" id="volumePercent">--%</div>
+    </div>
+
+    <!-- Idle screensaver (after gamepad inactivity) - see renderer/home/idle.js checkIdle().
+             The bouncing icons of the active launchers are added by `spawnAttractIcons()`
+             (dynamically) and cleared by `stopAttractIcons()` (`innerHTML = ''`). pointer-events:
+             none, so it never blocks a future mouse/touch input. -->
+    <div class="idle-overlay" id="idleOverlay"></div>
+    <!-- Software brightness + night mode (renderer/settings/settings-screen-filter.js) -->
+    <div class="screen-filter screen-filter-night" id="nightModeOverlay" aria-hidden="true"></div>
+    <div class="screen-filter screen-filter-dim" id="screenDimOverlay" aria-hidden="true"></div>
+
+    <div class="settings-icon-btn" id="settingsIconBtn" title="Settings">
+        <svg viewBox="0 0 24 24"><path
+                d="M3 10v4h4l5 5V5L7 10H3zm13.5 2A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+        </svg>
+        <span class="audio-current-name" id="audioCurrentName">HANG</span>
+    </div>
+
+    <!-- Settings panel: fixed size, always two columns. Left (#settingsMenuList): ALWAYS only the top-level
+             entries (categories), stacked. Right (#settingsContent): the focused category's item list, then,
+             once an item is chosen, the actual subview content — the two replace each other
+             (renderer/settings/settings.js `settingsZone`). Each column scrolls on its own. -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="settingsPanelTitle">Settings</div>
+            <div class="settings-body" id="settingsBody">
+                <div class="settings-list" id="settingsMenuList"></div>
+                <div class="settings-list" id="settingsContent"></div>
+            </div>
+            <div class="settings-panel-hint" id="settingsPanelHint"></div>
+        </div>
+    </div>
+
+    <!-- First-start setup wizard (monitor / audio / main controller / theme).
+             Standalone overlay reusing the .settings-* CSS. renderer/setup-wizard.js;
+             Settings → System → "Reconfigure" opens it too. -->
+    <div class="settings-overlay" id="setupOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="setupPanelTitle">Setup</div>
+            <div class="settings-list" id="setupContent"></div>
+            <div class="settings-panel-hint" id="setupPanelHint"></div>
+        </div>
+    </div>
+
+    <!-- Standalone overlay (not a Settings subview) opened from the main carousel's "Games"
+             pseudo-launcher card, see renderer/home/carousel.js GAMES_CARD +
+             renderer/games-panel/games-panel.js. Reuses the same .settings-* CSS. -->
+    <div class="settings-overlay" id="gamesOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="gamesPanelTitle">Games</div>
+            <div class="settings-list" id="gamesPanelContent"></div>
+            <div class="settings-panel-hint" id="gamesPanelHint"></div>
+        </div>
+    </div>
+
+    <!-- Opened with □ in the Games panel's root view: a toggle list of which launchers appear in the
+             ALL (mixed) view, see renderer/games-panel/games-panel-filter.js. Lives INSIDE
+             `#gamesOverlay` (after it in the DOM so it paints on top). -->
+    <!-- Game details view: opened by a LONG press of X on a game in the Games panel.
+             renderer/games-panel/games-panel-details.js fills it. -->
+    <div class="settings-overlay" id="gamesDetailsOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="gamesDetailsTitle">Game</div>
+            <div class="settings-list" id="gamesDetailsContent"></div>
+            <div class="settings-panel-hint" id="gamesDetailsHint"></div>
+        </div>
+    </div>
+
+    <div class="settings-overlay" id="gamesFilterOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="gamesFilterTitle">Launcher filter</div>
+            <div class="settings-list" id="gamesFilterContent"></div>
+            <div class="settings-panel-hint" id="gamesFilterHint"></div>
+        </div>
+    </div>
+
+    <!-- Launcher card quick actions: opened by a LONG press of X on the focused card.
+             renderer/home/card-menu.js fills it. -->
+    <div class="settings-overlay" id="cardMenuOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="cardMenuTitle">Card</div>
+            <div class="settings-list" id="cardMenuContent"></div>
+            <div class="settings-panel-hint" id="cardMenuHint"></div>
+        </div>
+    </div>
+
+    <!-- Quick system menu (Start/Options/Menu button) — Power off / Reboot / Sleep /
+             Close program, from anywhere on the home screen. renderer/home/quick-power.js fills it. -->
+    <div class="settings-overlay" id="quickPowerOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="quickPowerTitle">Rendszer</div>
+            <div class="settings-list" id="quickPowerContent"></div>
+            <div class="settings-panel-hint" id="quickPowerHint"></div>
+        </div>
+    </div>
+
+    <!-- In-app flatpak installer: opened by the "Install" button of a not-installed catalog launcher.
+             renderer/launcher-install.js fills it. -->
+    <div class="settings-overlay" id="launcherInstallOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="launcherInstallTitle">Install</div>
+            <div class="settings-list" id="launcherInstallContent"></div>
+            <div class="settings-panel-hint" id="launcherInstallHint"></div>
+        </div>
+    </div>
+
+    <!-- "What's new" panel after a self-update: one-off, from the latest CHANGELOG.md section.
+             renderer/changelog.js fills it. -->
+    <div class="settings-overlay" id="changelogOverlay">
+        <div class="settings-panel">
+            <div class="settings-panel-title" id="changelogTitle">What's new</div>
+            <div class="settings-list" id="changelogContent"></div>
+            <div class="settings-panel-hint" id="changelogHint"></div>
+        </div>
+    </div>
+
+    <!-- On-screen keyboard (renderer/keyboard.js) — opens ABOVE the Settings panel (higher z-index),
+             from any subview. First caller: the Wi-Fi password. -->
+    <div class="keyboard-overlay" id="keyboardOverlay">
+        <div class="keyboard-panel">
+            <div class="keyboard-title" id="keyboardTitle">Text input</div>
+            <div class="keyboard-input" id="keyboardInput"></div>
+            <div class="keyboard-grid" id="keyboardGrid"></div>
+            <div class="settings-panel-hint" id="keyboardHint"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Launchers Launcher</h1>
+            <div class="sub">by Mihi &nbsp;</div>
+        </div>
+
+        <!-- Global "▶ Continue" bar: the last 3 games of ALL sources. Filled by
+                     renderer/home/carousel.js renderContinueBar(); empty → the bar is hidden (takes no space). -->
+        <div class="continue-bar" id="continueBar" hidden></div>
+
+        <!-- Carousel edge "peek" arrows: faint ◀ ▶ behind the outer cards when there are more launchers
+                     than fit the 3-card window (renderer/home/carousel.js updateCarouselPeek() toggles [hidden]). -->
+        <div class="carousel-peek carousel-peek-left" id="carouselPeekLeft" aria-hidden="true" hidden>‹</div>
+        <div class="carousel-peek carousel-peek-right" id="carouselPeekRight" aria-hidden="true" hidden>›</div>
+
+        <!-- Loading skeleton: 3 static, pulsing "empty cards" (left/center/right, mimicking the carousel's
+                     initial layout) until renderer/main.js initLaunchers() receives the real launcher list over
+                     IPC. Zero JS — renderer/home/carousel.js renderCards() unconditionally overwrites this
+                     innerHTML once the data arrives, so the skeleton disappears by itself.
+                     See styles/02-home.css .card-skeleton. -->
+        <div class="cards" id="cards">
+            <div class="card card-skeleton pos-left" aria-hidden="true">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-bar skeleton-bar-name"></div>
+                <div class="skeleton-bar skeleton-bar-hint"></div>
+            </div>
+            <div class="card card-skeleton pos-center" aria-hidden="true">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-bar skeleton-bar-name"></div>
+                <div class="skeleton-bar skeleton-bar-hint"></div>
+            </div>
+            <div class="card card-skeleton pos-right" aria-hidden="true">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-bar skeleton-bar-name"></div>
+                <div class="skeleton-bar skeleton-bar-hint"></div>
+            </div>
+        </div>
+        <!-- Puts the launcher icons into the skeleton's circle placeholders (preload `initialLauncherIcons`,
+                     get-boot-state) - runs BEFORE the first paint (parser-blocking, after #cards), following
+                     the carousel's initial layout: center = first launcher, right = second, left = last
+                     (N=2: center + right only, N=1: center only). Broken icon → removed.
+                     renderCards() overwrites #cards, which removes the icons too. -->
+        <script src="renderer/boot/boot-cards.js"></script>
+        <!-- Dismisses #bootSplash (the logo's lift-off animation, top of the <body>) once the real cards are drawn AND the animation
+                     finished — observes #cards, so it is placed after it. -->
+        <script src="renderer/boot/boot-splash.js"></script>
+
+        <!-- Quick-launch bar: below the FOCUSED launcher card, up to 3 mini cover icons of the games most
+                     recently launched from that launcher. Filled by renderer/home/carousel.js renderRecentBar();
+                     the height is fixed in CSS so the layout does not jump between launchers. -->
+        <div class="recent-bar" id="recentBar"></div>
+    </div>
+
+    <!-- Filled by renderer/main.js renderBottomBar() with the `tr('bar.*')` strings. The static
+             HU rows below are the no-JS fallback / native initial state. -->
+    <div class="bottom-bar" id="bottomBar">
+        <div class="hint"><span class="btn-icon btn-x">✕</span> Launch</div>
+        <div class="hint"><span class="btn-icon btn-square">□</span> Card menu</div>
+        <div class="hint"><span style="color:var(--dim)">◀ ▶</span>&nbsp; Navigate</div>
+        <div class="hint"><span class="btn-icon btn-triangle">△</span> Games</div>
+        <div class="hint"><span class="btn-icon btn-view">⧉</span> Settings</div>
+        <div class="hint"><span style="color:var(--dim)">L1/R1</span> Volume</div>
+        <div class="hint"><span class="btn-icon btn-start">☰</span> Rendszer</div>
+        <div class="hint"><span class="btn-icon btn-ps">PS</span> Quit</div>
+    </div>
+
+    <!-- Spinning launcher icon (bottom-left corner) showing the startup warmup of the Games panel
+             sources. renderer/home/warmup.js shows/hides it from main's `games-warmup-state` push. -->
+    <div class="warmup-spinner" id="warmupSpinner" hidden aria-hidden="true"></div>
+
+    <!-- Controller type detection, shared with the main process (works as a require too). -->
+    <script src="controller-id.js"></script>
+    <!-- Shared data registry of the Games panel's emulator sources (main + renderer). -->
+    <script src="launcher-registry.js"></script>
+
+    <!-- The renderer is split into classic <script src> files (no build step, no type="module"):
+             the files share one global lexical scope, so the load ORDER matters (helpers first,
+             users later).
+               util       – esc / $ / edge / syncEdge / navList / BTN / showStatus / FALLBACK_ICON
+               i18n       – tr(key) string tables
+               controller-labels – button glyphs matching the active controller type + btnIcon()/btnGlyph()
+               state      – the globals mutated from SEVERAL files in one place (an inventory, not a mechanism)
+               controller-icons  – CONTROLLER_ICONS map (shared: settings-bt + controller-status)
+               controller-status – home-screen per-controller icon + battery badge
+               overlays   – loading / TV-exit progress / volume bar
+               carousel   – launchers/cards/focusedIndex + ringOffset / layoutCarousel / renderCards + GAMES_CARD
+               games-panel – standalone "Games" overlay from the GAMES_CARD card (not a Settings subview)
+               gamepad    – aggregatePad / pollGamepad skeleton + main nav + launchApp + watchdog
+               idle       – idle screensaver (isIdle / checkIdle / showIdleOverlay / hideIdleOverlay)
+               settings   – panel skeleton: menu <-> subview, shared helpers, input dispatcher
+               settings-* – the Settings subviews
+               ipc        – window.launcher.on* notifications
+               main       – entry point: init + DOM wiring + poll loop start + keydown fallback -->
+    <script src="renderer/util.js"></script>
+    <!-- Right after util.js: the global error overlay + error log (renderer/errors.js) also catches
+             load- AND run-time errors of the files loaded later. -->
+    <script src="renderer/errors.js"></script>
+    <script src="renderer/i18n/i18n-hu.js"></script>
+    <script src="renderer/i18n/i18n-en.js"></script>
+    <script src="renderer/i18n/i18n.js"></script>
+    <script src="renderer/controller/controller-labels.js"></script>
+    <script src="renderer/state.js"></script>
+    <script src="renderer/feedback.js"></script>
+    <script src="renderer/controller/controller-icons.js"></script>
+    <script src="renderer/controller/controller-status.js"></script>
+    <script src="renderer/controller/controller-help.js"></script>
+    <script src="renderer/overlays.js"></script>
+    <script src="renderer/home/tips.js"></script>
+    <script src="renderer/a11y.js"></script>
+    <script src="renderer/home/warmup.js"></script>
+    <script src="renderer/home/carousel.js"></script>
+    <script src="renderer/games-panel/games-panel-sources.js"></script>
+    <script src="renderer/games-panel/games-panel-covers.js"></script>
+    <script src="renderer/games-panel/games-panel-search.js"></script>
+    <script src="renderer/games-panel/games-panel-render.js"></script>
+    <script src="renderer/games-panel/games-panel-unified.js"></script>
+    <script src="renderer/games-panel/games-panel-favorites.js"></script>
+    <script src="renderer/games-panel/games-panel-filter.js"></script>
+    <script src="renderer/games-panel/games-panel-details.js"></script>
+    <script src="renderer/games-panel/games-panel-data.js"></script>
+    <script src="renderer/games-panel/games-panel.js"></script>
+    <script src="renderer/home/card-menu.js"></script>
+    <script src="renderer/home/quick-power.js"></script>
+    <script src="renderer/changelog.js"></script>
+    <script src="renderer/launcher-install.js"></script>
+    <script src="renderer/gamepad.js"></script>
+    <script src="renderer/home/idle.js"></script>
+    <script src="renderer/home/idle-power.js"></script>
+    <script src="renderer/settings/settings.js"></script>
+    <script src="renderer/settings/settings-toggle.js"></script>
+    <script src="renderer/settings/settings-search.js"></script>
+    <script src="renderer/settings/settings-dir-browse.js"></script>
+    <script src="renderer/settings/settings-launcher-path.js"></script>
+    <script src="renderer/settings/settings-launcher-add.js"></script>
+    <script src="renderer/settings/settings-launcher-roms.js"></script>
+    <script src="renderer/settings/settings-audio.js"></script>
+    <script src="renderer/settings/settings-startup.js"></script>
+    <script src="renderer/settings/settings-bt.js"></script>
+    <script src="renderer/settings/settings-main-controller.js"></script>
+    <script src="renderer/settings/settings-controller-autostart.js"></script>
+    <script src="renderer/settings/settings-launchers.js"></script>
+    <script src="renderer/settings/settings-order.js"></script>
+    <script src="renderer/settings/settings-cover-download.js"></script>
+    <script src="renderer/settings/settings-games-view.js"></script>
+    <script src="renderer/settings/settings-recent-games.js"></script>
+    <script src="renderer/settings/settings-theme.js"></script>
+    <script src="renderer/settings/settings-feedback.js"></script>
+    <script src="renderer/settings/settings-accessibility.js"></script>
+    <script src="renderer/settings/settings-tips.js"></script>
+    <script src="renderer/settings/settings-language.js"></script>
+    <script src="renderer/settings/settings-ui-scale.js"></script>
+    <script src="renderer/settings/settings-background.js"></script>
+    <script src="renderer/settings/settings-output-behavior.js"></script>
+    <script src="renderer/settings/settings-tv-mode.js"></script>
+    <script src="renderer/settings/settings-melonds-rom-dirs.js"></script>
+    <script src="renderer/settings/settings-stats.js"></script>
+    <script src="renderer/settings/settings-diagnostics.js"></script>
+    <script src="renderer/settings/settings-log.js"></script>
+    <script src="renderer/settings/settings-update.js"></script>
+    <script src="renderer/settings/settings-system.js"></script>
+    <script src="renderer/settings/settings-wifi.js"></script>
+    <script src="renderer/settings/settings-config-backups.js"></script>
+    <script src="renderer/settings/settings-transfer.js"></script>
+    <script src="renderer/settings/settings-save-backup.js"></script>
+    <script src="renderer/settings/settings-controls.js"></script>
+    <script src="renderer/settings/settings-sleep-timer.js"></script>
+    <script src="renderer/settings/settings-always-on-top.js"></script>
+    <script src="renderer/settings/settings-start-with-system.js"></script>
+    <script src="renderer/settings/settings-idle-timeout.js"></script>
+    <script src="renderer/settings/settings-volume-step.js"></script>
+    <script src="renderer/settings/settings-volume-max.js"></script>
+    <script src="renderer/settings/settings-tv-exit-hold.js"></script>
+    <script src="renderer/settings/settings-do-not-disturb.js"></script>
+    <script src="renderer/settings/settings-playtime-reminder.js"></script>
+    <script src="renderer/settings/settings-screen-filter.js"></script>
+    <script src="renderer/settings/settings-idle-power.js"></script>
+    <script src="renderer/settings/settings-games-cache.js"></script>
+    <script src="renderer/settings/settings-rom-access.js"></script>
+    <script src="renderer/setup-wizard.js"></script>
+    <script src="renderer/keyboard.js"></script>
+    <script src="renderer/ipc.js"></script>
+    <script src="renderer/main.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,243 @@
+/* styles/08-boot-splash.css — the startup splash (index.html #bootSplash, renderer/boot/boot-splash.js): the logo's "lift-off from the
+   controller" animation. Design reference: the "Liftoff" + "D-pad rocket" mockups; the stage is a 1280x720 viewBox.
+
+   The camera follows the rocket up: the controller (the `.sp-world`) slides out at the bottom while the rocket flies, and ends as the
+   LOGO (rocket with a short flame) with the "LAUNCHERS / LAUNCHER" lettering to its right.
+
+   The BASE style of every part is that final frame; the animations only supply the `from` state (`both` fill) — so with
+   `:root[data-motion="off"] * { animation: none !important }` (01-base.css) a static logo remains (no controller), no extra rule needed.
+   Theme-independent colors on purpose: the theme is not necessarily applied at the first paint.
+
+   Timeline (the `sp-total` animation on the root = 3.4s; boot-splash.js waits for its end):
+     0.0-0.5s  the scene fades in (the controller + the D-pad-rocket seated in the pad)
+     0.5-1.2s  ignition: the pad shakes, the glow + smoke puffs appear, the flame lights
+     1.2-2.7s  lift-off: the rocket rises + grows to the logo size, the controller drops out of the frame, the flame
+               lengthens, then shrinks to the logo's short flame; speed streaks run past
+     2.3-3.4s  the lettering slides in to the right of the rocket */
+
+.boot-splash {
+    position: fixed;
+    inset: 0;
+    /* Above the screensaver (300), BELOW the brightness/night filters (350/351) and the fatal error overlay (400). */
+    z-index: 340;
+    background: #0e1120;
+    opacity: 1;
+    animation: sp-total 3.4s linear;
+}
+
+/* Dismissal (boot-splash.js): fade out, then the element is removed. */
+.boot-splash.is-leaving {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+}
+
+/* The 1280x720 stage fills the screen (`meet`: on a non-16:9 screen the rest is the same background). */
+.boot-splash-art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: sp-in 0.5s ease-out both;
+}
+
+.sp-stars circle {
+    animation: sp-twinkle 2.6s ease-in-out infinite;
+}
+
+.sp-stars circle:nth-child(2n) {
+    animation-delay: -0.9s;
+}
+
+.sp-stars circle:nth-child(3n) {
+    animation-delay: -1.7s;
+}
+
+/* The world (controller + smoke): final = far below the frame. Start = the controller's pad (world 263.5, 489.7) on the stage
+   point (440, 421.7). */
+.sp-world {
+    transform: translate(176.5px, 782px);
+    animation: sp-world 1.5s cubic-bezier(0.5, 0, 0.2, 1) 1.2s both;
+}
+
+/* The controller recoils a little at ignition, then settles back. */
+.sp-controller {
+    animation: sp-recoil 0.9s ease-in-out 0.55s both;
+}
+
+.sp-glow {
+    animation: sp-glow 0.7s ease-out 0.5s both;
+}
+
+.sp-puffs circle {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sp-puff 1s ease-out 0.7s both;
+}
+
+.sp-puffs circle:nth-child(2n) {
+    animation-delay: 0.85s;
+}
+
+/* The rocket in its own coordinate system (the logo's 240x240 design). Final (the logo): scale 1.5, its centre-left of the stage. */
+.sp-rocket {
+    transform: translate(167px, 164px) scale(1.5);
+    animation: sp-lift 1.5s cubic-bezier(0.5, 0, 0.2, 1) 1.2s both;
+}
+
+.sp-shake {
+    animation: sp-shake 0.07s linear 0.5s 10 alternate;
+}
+
+/* The flame grows from the tail (local y=192, x=120), is long during the climb, then shrinks to the logo's short flame (= the base
+   scale) and flickers. */
+.sp-flame {
+    transform: scale(0.65, 0.28);
+    transform-origin: 120px 192px;
+    animation: sp-flame 2.2s ease-in-out 0.5s both;
+}
+
+.sp-flame-flick {
+    transform-origin: 120px 192px;
+    animation: sp-flicker 0.16s ease-in-out 2.7s infinite alternate;
+}
+
+/* Speed streaks: invisible at rest (the final frame has none); they run downward past the rocket during the climb. */
+.sp-lines line {
+    opacity: 0;
+    animation: sp-streak 0.5s linear 1.5s 2;
+}
+
+.sp-lines line:nth-child(2) {
+    animation-delay: 1.65s;
+}
+
+.sp-lines line:nth-child(3) {
+    animation-delay: 1.55s;
+}
+
+.sp-lines line:nth-child(4) {
+    animation-delay: 1.75s;
+}
+
+.sp-text {
+    animation: sp-text 0.8s ease-out 2.3s both;
+}
+
+.sp-text-2 {
+    animation-delay: 2.6s;
+    animation-duration: 0.8s;
+}
+
+@keyframes sp-total {
+    from,
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes sp-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes sp-twinkle {
+    50% {
+        opacity: 0.25;
+    }
+}
+
+@keyframes sp-world {
+    from {
+        transform: translate(176.5px, -68px);
+    }
+}
+
+@keyframes sp-recoil {
+    30% {
+        transform: translateY(6px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes sp-glow {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes sp-puff {
+    from {
+        opacity: 0;
+        transform: scale(0.2);
+    }
+}
+
+@keyframes sp-lift {
+    from {
+        /* seated in the controller's D-pad: the cross (local 120,130) lands on the pad (stage 440, 421.7) at scale 0.5 */
+        transform: translate(380px, 356.7px) scale(0.5);
+    }
+}
+
+@keyframes sp-shake {
+    from {
+        transform: translate(-1.2px, 0);
+    }
+
+    to {
+        transform: translate(1.2px, 0.8px);
+    }
+}
+
+@keyframes sp-flame {
+    0% {
+        transform: scale(0.6, 0);
+    }
+
+    32% {
+        transform: scale(0.7, 0.3);
+    }
+
+    65% {
+        transform: scale(1, 1);
+    }
+}
+
+@keyframes sp-flicker {
+    from {
+        transform: scaleY(1);
+    }
+
+    to {
+        transform: scaleY(0.93);
+    }
+}
+
+@keyframes sp-streak {
+    0% {
+        opacity: 0;
+        transform: translateY(-80px);
+    }
+
+    25%,
+    75% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(220px);
+    }
+}
+
+@keyframes sp-text {
+    from {
+        opacity: 0;
+        transform: translateX(-24px);
+    }
+}

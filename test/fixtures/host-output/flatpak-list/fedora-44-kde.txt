@@ -1,0 +1,6 @@
+com.usebottles.bottles	Palackok
+net.davidotek.pupgui2	ProtonUp-Qt
+org.chromium.Chromium	Chromium Web Browser
+org.libretro.RetroArch	RetroArch
+org.openttd.OpenTTD	OpenTTD
+us.zoom.Zoom	Zoom

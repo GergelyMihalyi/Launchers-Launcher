@@ -1,0 +1,9 @@
+[Context]
+shared=ipc;
+sockets=fallback-x11;wayland;x11;
+devices=dri;
+filesystems=xdg-data/flatpak/overrides:create;/var/lib/flatpak/app:ro;xdg-data/flatpak/app:ro;
+
+[Session Bus Policy]
+org.gnome.Software=talk
+org.freedesktop.impl.portal.PermissionStore=talk

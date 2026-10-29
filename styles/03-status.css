@@ -1,0 +1,218 @@
+/* styles/03-status.css — Status indicators: toast, safe-mode bar, error state, launch overlay, shared keyframes.
+   The styles/NN-*.css files load in NUMERIC ORDER in index.html (test/contracts/css-links.test.js). */
+/* Status message */
+.status {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 50;
+}
+
+.status.visible {
+    opacity: 1;
+}
+
+/* Safe-mode warning bar (lib/safe-mode.js) — above the header, it covers no navigation element. */
+.safe-mode-banner {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 92vw;
+    padding: 0.4em 1.2em;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background: var(--accent2, #c62828);
+    border-radius: 0 0 0.6em 0.6em;
+    z-index: 60;
+    text-align: center;
+}
+
+.safe-mode-banner[hidden] {
+    display: none;
+}
+
+/* Error state */
+.status.error {
+    color: var(--accent2);
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.loading-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.loading-text {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    animation: blink 1s ease infinite;
+}
+
+/* "Hold ○ = cancel" on the loading screen + a progress bar. */
+.loading-overlay .loading-cancel {
+    position: relative;
+    z-index: 1;
+    margin-top: 1.2em;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--dim, var(--text));
+    opacity: 0.8;
+    text-align: center;
+}
+
+.loading-cancel-track {
+    margin: 0.5em auto 0;
+    width: 12em;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.loading-cancel-fill {
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+}
+
+/* The cover on a game launch: sharp in the middle + blurred, faintly behind the whole overlay (the .card-bg blur pattern). The text/loader
+   stays above the background. */
+.loading-cover-bg {
+    position: absolute;
+    inset: -8%;
+    width: 116%;
+    height: 116%;
+    object-fit: cover;
+    filter: blur(clamp(18px, 3vh, 60px)) saturate(1.2);
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.loading-cover {
+    position: relative;
+    z-index: 1;
+    max-height: 34vh;
+    max-width: 60vw;
+    border-radius: 10px;
+    box-shadow: 0 1.2em 3em rgba(0, 0, 0, 0.55);
+    animation: fadeIn 0.4s ease;
+}
+
+.loading-overlay .loading-text,
+.loading-overlay #loadingLoader {
+    position: relative;
+    z-index: 1;
+}
+
+.loading-cover[hidden],
+.loading-cover-bg[hidden] {
+    display: none;
+}
+
+/* The icon loader of the launch overlay (renderer/overlays.js showLoading fills #loadingLoader). See .launcher-loader below. */
+.loading-overlay .launcher-loader {
+    margin: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.6
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.2
+    }
+
+    100% {
+        transform: scale(0.9);
+        opacity: 0.6
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1
+    }
+
+    50% {
+        opacity: 0.3
+    }
+}
+
+.app-icon {
+    /* @1080 = 128px, @2160 ~257px - proportional to the card-icon container */
+    width: clamp(128px, 11.9vh, 300px);
+    height: clamp(128px, 11.9vh, 300px);
+    object-fit: contain;
+    filter: grayscale(100%) brightness(0.5);
+    transition: filter 0.3s ease;
+}
+
+.card.focused .app-icon {
+    filter: grayscale(0%) brightness(1) drop-shadow(0 0 12px color-mix(in srgb, var(--card-accent, var(--accent)) 60%, transparent));
+}
+
+
+/* First-use tip bubble: non-modal, above the bottom bar, above the panels (z 100). */
+.tip-bubble {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--bottom-bar-h, 60px) + 1.6em);
+    transform: translateX(-50%);
+    z-index: 300;
+    max-width: min(80vw, 60em);
+    padding: 0.7em 1.2em;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    text-align: center;
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.78);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    pointer-events: none;
+    animation: fadeIn 0.4s ease both;
+}
+
+.tip-bubble[hidden] { display: none; }

@@ -1,0 +1,39 @@
+/* "GameCube" (gamecube) theme — the indigo/purple mood of the boot animation: a checkered mosaic background + a soft purple glow, rounded
+   cards, a playful font. An additive override, every rule nested under :root[data-theme="gamecube"]. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+:root[data-theme="gamecube"] {
+    --bg: #211a3a;
+    --surface: #322a52;
+    --accent: #6c5ce7;
+    /* GC purple */
+    --accent2: #a29bfe;
+    --text: #e4e0f5;
+    --dim: #7a739d;
+    --running: #55d6a0;
+
+    --font-body: 'Fredoka', 'Trebuchet MS', sans-serif;
+    --font-display: 'Fredoka', sans-serif;
+
+    --focus-shadow: 0 0 20px color-mix(in srgb, var(--focus-glow-color) 40%, transparent), 0 0 55px color-mix(in srgb, var(--focus-glow-color) 15%, transparent);
+    --focus-shadow-danger: 0 0 20px rgba(255, 61, 110, 0.45);
+
+    --scanline-opacity: 0;
+    /* Checkered mosaic (the boot cube's pattern) + a purple glow at the top. */
+    --ambient:
+        linear-gradient(45deg, rgba(108, 92, 231, 0.08) 25%, transparent 25% 50%, rgba(108, 92, 231, 0.08) 50% 75%, transparent 75%) 0 0 / 60px 60px,
+        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(162, 155, 254, 0.14) 0%, transparent 70%),
+        #211a3a;
+    --card-radius: 16px;
+    --card-border: 1px solid rgba(108, 92, 231, 0.28);
+    --corner-decor: none;
+    --card-bg-opacity: 0.16;
+
+    & .header h1 {
+        background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 20px rgba(108, 92, 231, 0.5));
+    }
+}

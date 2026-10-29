@@ -1,0 +1,35 @@
+# Launchers Launcher — root-less BT controller trigger (BlueZ D-Bus listener).
+#
+# Runs bin/launchers-launcher-bt-trigger.sh as the user, DIRECTLY from the repo
+# (%h/launchers-launcher/bin) — no /usr/local/bin copy, no sudo, no writes to /etc.
+#
+# NOTE: this file does NOT run from the repo — the ~/.config/systemd/user/ copy runs (copied
+# by hand). Unlike the watcher unit, ExecStart calls the repo, so a `git pull` needs no
+# separate copy; only the .service file itself is manual.
+#
+# ⚠️ bin/launchers-launcher-bt-trigger.sh is a long-running `while true` listener — editing
+# the file does NOT reach the already-running process. After a change always run:
+#   systemctl --user restart launchers-launcher-bt-trigger.service
+# (a plain `git pull` is NOT enough, see systemd/README.md).
+#
+# Install (no root):
+#   cp ~/launchers-launcher/systemd/launchers-launcher-bt-trigger.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now launchers-launcher-bt-trigger.service
+#
+# For cold boot (trigger before login) the `systemctl --user` service needs
+# lingering:  loginctl enable-linger $USER   (NOT needed with kiosk autologin).
+
+[Unit]
+Description=Launchers Launcher BT Controller Trigger
+After=graphical-session.target bluetooth.target
+Wants=bluetooth.target
+
+[Service]
+Type=simple
+ExecStart=%h/launchers-launcher/bin/launchers-launcher-bt-trigger.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

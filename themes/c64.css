@@ -1,0 +1,40 @@
+/* "Commodore 64" (c64) theme — the classic blue-in-blue screen: dark blue base, light blue text/border, chunky pixel font (VT323), a thin
+   border frame, CRT scanline. A thick pixel border marks the focus (not a glow). An additive override, every rule nested under
+   :root[data-theme="c64"]. */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root[data-theme="c64"] {
+    --bg: #40318d;
+    --surface: #514497;
+    --accent: #8f88e0;
+    /* C64 light blue text */
+    --accent2: #9ee6e6;
+    --text: #b8b0ec;
+    --dim: #7268b8;
+    --running: #a3e88f;
+    /* C64 green */
+
+    --font-body: 'VT323', 'Share Tech Mono', monospace;
+    --font-display: 'VT323', 'Share Tech Mono', monospace;
+
+    /* Pixel border on the focus, no glow. */
+    --focus-shadow: 0 0 0 3px var(--focus-glow-color);
+    --focus-shadow-danger: 0 0 0 3px #d86a6a;
+
+    --scanline-opacity: 0.1;
+    --ambient:
+        radial-gradient(ellipse 120% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.18) 100%),
+        #40318d;
+    --card-radius: 0;
+    --card-border: 2px solid var(--accent);
+    --corner-decor: none;
+    --card-bg-opacity: 0.12;
+
+    & .header h1 {
+        background: none;
+        -webkit-text-fill-color: var(--accent);
+        filter: none;
+        letter-spacing: 0.08em;
+    }
+}

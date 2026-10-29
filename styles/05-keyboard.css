@@ -1,0 +1,134 @@
+/* styles/05-keyboard.css — On-screen keyboard (renderer/keyboard.js), with the docked (Games search) variant.
+   The styles/NN-*.css files load in NUMERIC ORDER in index.html (test/contracts/css-links.test.js). */
+/* --- On-screen keyboard (renderer/keyboard.js) --- */
+/* ABOVE the Settings panel (z-index 250 > settings-overlay 210), like .settings-overlay; .keyboard-key follows the focus style of
+   .settings-item.focused. */
+.keyboard-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 250;
+    background: rgba(4, 4, 10, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+.keyboard-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.keyboard-panel {
+    width: min(94vw, clamp(560px, 60vh, 1200px));
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    box-shadow: var(--focus-shadow);
+    padding: 1.4em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9em;
+}
+
+.keyboard-title {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-align: center;
+}
+
+.keyboard-input {
+    min-height: 1.6em;
+    padding: 0.5em 0.7em;
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    word-break: break-all;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.keyboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 0.4em;
+}
+
+.keyboard-key {
+    flex: 1;
+    text-align: center;
+    padding: 0.55em 0;
+    border: 1px solid rgba(0, 229, 255, 0.12);
+    border-radius: 4px;
+    font-size: 1rem;
+    color: var(--text);
+    text-transform: none;
+}
+
+.keyboard-key-special {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+}
+
+.keyboard-key.active {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.keyboard-key.focused {
+    border-color: var(--accent);
+    background: rgba(0, 229, 255, 0.12);
+    color: var(--accent);
+}
+
+/* Docked (bottom-edge) keyboard — the Games panel's live search: transparent background, the panel only covers the bottom edge, the list
+   behind it stays visible and refreshes after every letter. The title is unnecessary (the search bar shows it). */
+.keyboard-overlay.docked,
+.keyboard-overlay.docked.visible {
+    background: transparent;
+    align-items: flex-end;
+    pointer-events: none;
+}
+
+.keyboard-overlay.docked .keyboard-panel {
+    pointer-events: all;
+    width: min(96vw, clamp(640px, 70vh, 1300px));
+    padding: 0.9em 1.2em;
+    gap: 0.5em;
+    border-bottom-width: 0;
+    border-radius: 6px 6px 0 0;
+}
+
+.keyboard-overlay.docked .keyboard-title {
+    display: none;
+}
+
+.keyboard-overlay.docked .keyboard-key {
+    padding: 0.45em 0;
+}
+
+
+/* Suggestion row (the recent searches): long text truncated, on one line. */
+.keyboard-key-special.keyboard-key-sug,
+.keyboard-key-sug {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

@@ -1,0 +1,14 @@
+[Context]
+shared=ipc;network;
+sockets=pulseaudio;wayland;x11;
+devices=all;
+features=devel;multiarch;per-app-dev-shm;
+filesystems=home;~/.local/share/umu:create;~/Games/umu:create;
+
+[System Bus Policy]
+org.freedesktop.UDisks2=talk
+
+[Environment]
+LD_LIBRARY_PATH=/app/lib:/app/lib/i386-linux-gnu
+GST_PLUGIN_SYSTEM_PATH=/app/lib/gstreamer-1.0:/usr/lib/x86_64-linux-gnu/gstreamer-1.0:/usr/lib/i386-linux-gnu/gstreamer-1.0
+PATH=/app/bin:/app/utils/bin:/usr/bin:/usr/lib/extensions/vulkan/MangoHud/bin/:/usr/bin:/usr/lib/extensions/vulkan/OBSVkCapture/bin/:/usr/lib/extensions/vulkan/gamescope/bin/

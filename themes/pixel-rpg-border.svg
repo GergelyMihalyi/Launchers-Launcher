@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <!-- Pixel-art "JRPG message window" border-image tile.
+       A 3x3 grid (16x16 cells): the 4 corners + the 4 edge patterns, the middle is empty
+       (border-image-slice drops the centre tile, the card's own background shows there).
+       The corner/edge base pattern is drawn once (#corner / #edgeH / #edgeV), the other 7
+       placements are <use> + transform (mirroring) — no fourfold code duplication. -->
+  <defs>
+    <g id="corner">
+      <!-- L-shaped thick frame band + a dark pixel rounding in the tip + a gold "ornament stone" -->
+      <rect x="0" y="0" width="16" height="6" fill="#4a5a9c"/>
+      <rect x="0" y="0" width="6" height="16" fill="#4a5a9c"/>
+      <rect x="0" y="0" width="3" height="3" fill="#0b1021"/>
+      <rect x="6" y="6" width="6" height="6" fill="#f6c945"/>
+      <rect x="8" y="8" width="2" height="2" fill="#c9962a"/>
+    </g>
+    <g id="edgeH">
+      <!-- horizontal edge tile (top/bottom, repeats in the x direction) -->
+      <rect x="0" y="0" width="16" height="6" fill="#4a5a9c"/>
+      <rect x="0" y="0" width="6" height="6" fill="#0b1021"/>
+      <rect x="0" y="6" width="16" height="2" fill="#2c3868"/>
+      <rect x="7" y="1" width="2" height="2" fill="#f6c945"/>
+    </g>
+    <g id="edgeV">
+      <!-- vertical edge tile (left/right, repeats in the y direction) -->
+      <rect x="0" y="0" width="6" height="16" fill="#4a5a9c"/>
+      <rect x="0" y="0" width="6" height="6" fill="#0b1021"/>
+      <rect x="6" y="0" width="2" height="16" fill="#2c3868"/>
+      <rect x="1" y="7" width="2" height="2" fill="#f6c945"/>
+    </g>
+  </defs>
+
+  <use href="#corner" x="0" y="0"/>
+  <use href="#corner" transform="translate(48,0) scale(-1,1)"/>
+  <use href="#corner" transform="translate(0,48) scale(1,-1)"/>
+  <use href="#corner" transform="translate(48,48) scale(-1,-1)"/>
+
+  <use href="#edgeH" x="16" y="0"/>
+  <use href="#edgeH" transform="translate(16,48) scale(1,-1)"/>
+  <use href="#edgeV" x="0" y="16"/>
+  <use href="#edgeV" transform="translate(48,16) scale(-1,1)"/>
+</svg>

@@ -1,0 +1,47 @@
+/* "Terminal" (amber) theme — a monochrome amber phosphor screen: every color one hue, `Share Tech Mono` for everything, strong scanline,
+   thin amber borders with corner brackets (fits the terminal mood). NO `motion: "off"` — the carousel slide stays —, but no separate
+   flicker either (could be annoying on a TV). An additive override, every rule nested under :root[data-theme="amber"]. */
+
+:root[data-theme="amber"] {
+    --bg: #160f00;
+    --surface: #241a04;
+    --accent: #ffb000;
+    /* P3 amber phosphor */
+    --accent2: #ffb000;
+    /* monochrome — "danger" is amber too, only the text signals it */
+    --text: #ffc356;
+    --dim: #9a7420;
+    --running: #ffb000;
+
+    --font-body: 'Share Tech Mono', ui-monospace, monospace;
+    --font-display: 'Share Tech Mono', ui-monospace, monospace;
+
+    /* Monochrome: the per-launcher accent (carousel inline --card-accent) is ignored. */
+    --card-accent: var(--accent) !important;
+    --focus-glow-color: var(--accent);
+    --focus-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+    --focus-shadow-danger: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+
+    --scanline-opacity: 0.16;
+    --ambient:
+        radial-gradient(ellipse 90% 70% at 50% 45%, rgba(255, 176, 0, 0.05) 0%, transparent 70%),
+        #160f00;
+    --card-radius: 0;
+    --card-border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    --corner-decor: block;
+    --card-bg-opacity: 0;
+    /* monochrome terminal — a colorful blurred icon does not fit here */
+
+    & .header h1 {
+        background: none;
+        -webkit-text-fill-color: var(--accent);
+        filter: none;
+        text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 45%, transparent);
+        letter-spacing: 0.3em;
+    }
+
+    /* The focused icon gets an amber glow (like on neon, but one hue). */
+    & .card.focused .card-icon svg {
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 55%, transparent));
+    }
+}

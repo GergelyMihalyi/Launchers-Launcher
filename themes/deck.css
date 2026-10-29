@@ -1,0 +1,43 @@
+/* "SteamOS" (deck) theme — the mood of Steam Big Picture / the Deck Gamepad UI: deep bluish-grey base, Steam-blue accent, soft rounding,
+   a subtle (not neon-strong) glow, scanline off. An additive override above styles/*.css, every rule nested under :root[data-theme="deck"]
+   (native CSS nesting) — only live with <html data-theme="deck">. Most of the structural switch comes from tokens; only .header h1 stays a
+   selector override (to turn off the gradient text). Font: Inter (Steam's own Motiva Sans is not on Google Fonts — Inter is the closest
+   clean, neutral sans). */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root[data-theme="deck"] {
+    --bg: #1b2838;
+    --surface: #2a3f5a;
+    --accent: #1a9fff;
+    /* Steam blue */
+    --accent2: #66c0f4;
+    /* light blue complement */
+    --text: #dfe3e8;
+    --dim: #8b98a6;
+    --running: #57cbde;
+
+    --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+    /* A subtle blue halo — not neon's multi-layer glow. Per-launcher accent through --focus-glow-color. */
+    --focus-shadow: 0 0 18px color-mix(in srgb, var(--focus-glow-color) 35%, transparent);
+    --focus-shadow-danger: 0 0 18px rgba(255, 61, 110, 0.4);
+
+    --scanline-opacity: 0;
+    --ambient:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26, 159, 255, 0.13) 0%, transparent 70%),
+        linear-gradient(180deg, #1b2838 0%, #16202d 100%);
+    --card-radius: 12px;
+    --card-border: 1px solid rgba(26, 159, 255, 0.16);
+    --corner-decor: none;
+    --card-bg-opacity: 0.22;
+    /* Steam-library-like: a slightly more pronounced blurred background cover */
+
+    & .header h1 {
+        background: none;
+        -webkit-text-fill-color: var(--accent);
+        filter: none;
+        letter-spacing: 0.14em;
+    }
+}

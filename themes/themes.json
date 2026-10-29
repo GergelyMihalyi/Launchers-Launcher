@@ -1,0 +1,17 @@
+[
+  { "id": "neon", "label": "Neon (default)", "swatch": ["#04040a", "#0d0d1a", "#00e5ff"] },
+  { "id": "nintendo", "label": "Nintendo", "swatch": ["#f4f6fb", "#ffffff", "#e60012"] },
+  { "id": "win31", "label": "Windows 3.1", "swatch": ["#008080", "#c0c0c0", "#000080"], "motion": "off" },
+  { "id": "deck", "label": "SteamOS", "swatch": ["#1b2838", "#2a3f5a", "#1a9fff"] },
+  { "id": "oled", "label": "OLED (black)", "swatch": ["#000000", "#0a0a0a", "#e8e8e8"] },
+  { "id": "nord", "label": "Calm dark", "swatch": ["#2e3440", "#3b4252", "#88c0d0"], "motion": "off" },
+  { "id": "amber", "label": "Terminal", "swatch": ["#160f00", "#241a04", "#ffb000"] },
+  { "id": "vapor", "label": "Vaporwave", "swatch": ["#1a0b2e", "#2d1b4e", "#ff71ce"] },
+  { "id": "ps2", "label": "PlayStation 2", "swatch": ["#01012b", "#0a0a3a", "#4a9eff"] },
+  { "id": "famicom", "label": "Famicom", "swatch": ["#f2e8d5", "#fbf5e9", "#b3122b"] },
+  { "id": "gamecube", "label": "GameCube", "swatch": ["#211a3a", "#322a52", "#6c5ce7"] },
+  { "id": "dreamcast", "label": "Dreamcast", "swatch": ["#f4f2ee", "#ffffff", "#e8620c"] },
+  { "id": "c64", "label": "Commodore 64", "swatch": ["#40318d", "#514497", "#8f88e0"] },
+  { "id": "xp", "label": "Windows XP", "swatch": ["#1c53c4", "#ece9d8", "#2f6fd6"] },
+  { "id": "pixel-rpg", "label": "Pixel RPG", "swatch": ["#0b1021", "#1c2444", "#f6c945"] }
+]

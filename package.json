@@ -1,0 +1,30 @@
+{
+    "name": "launchers-launcher",
+    "version": "1.1.0",
+    "description": "Full-screen, controller-driven kiosk launcher for a KDE/Wayland living-room PC (Steam / Heroic / RetroArch) with HDMI-CEC TV mode.",
+    "license": "MIT",
+    "repository": "github:GergelyMihalyi/Launchers-Launcher",
+    "main": "bootstrap.js",
+    "engines": {
+        "node": ">=22.12"
+    },
+    "scripts": {
+        "start": "node bin/start.js",
+        "test": "node --test --require ./test/helpers/setup.js \"test/**/*.test.js\"",
+        "postinstall": "install-electron",
+        "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
+        "test:e2e": "node --test test/e2e/e2e.spec.js",
+        "typecheck": "tsc -p jsconfig.json && tsc -p jsconfig.renderer.json",
+        "new-emulator": "node tools/new-emulator.js",
+        "user-guide-shots": "env -u ELECTRON_RUN_AS_NODE node_modules/electron/dist/electron tools/user-guide/user-guide-shots.js --headless --no-sandbox",
+        "lint:shell": "npx --yes shellcheck@4.1.0 -S warning -x bin/*.sh install.sh get-launchers-launcher.sh $(ls tools/*.sh 2>/dev/null) .githooks/*",
+        "setup-hooks": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
+    },
+    "dependencies": {
+        "electron": "^44.4.5"
+    },
+    "devDependencies": {
+        "@types/node": "^22",
+        "typescript": "~5.9.3"
+    }
+}

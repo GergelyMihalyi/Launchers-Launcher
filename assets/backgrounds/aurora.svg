@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a1a33"/>
+      <stop offset="0.55" stop-color="#08111f"/>
+      <stop offset="1" stop-color="#050a12"/>
+    </linearGradient>
+    <radialGradient id="g1" cx="0.25" cy="0.15" r="0.6">
+      <stop offset="0" stop-color="#1c6e8c" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#1c6e8c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="0.8" cy="0.35" r="0.55">
+      <stop offset="0" stop-color="#2f9e7a" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#2f9e7a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="60"/></filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <g filter="url(#blur)">
+    <ellipse cx="470" cy="150" rx="700" ry="420" fill="url(#g1)"/>
+    <ellipse cx="1560" cy="380" rx="620" ry="460" fill="url(#g2)"/>
+    <path d="M-100 720 Q 480 560 960 700 T 2020 660 V1180 H-100 Z" fill="#0d3a4a" opacity="0.5"/>
+  </g>
+</svg>

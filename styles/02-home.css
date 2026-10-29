@@ -1,0 +1,712 @@
+/* styles/02-home.css — Home screen: header, clock, controller badge, carousel cards, skeleton, quick-launch and Continue bars, bottom
+   hint bar, warmup indicator. The styles/NN-*.css files load in NUMERIC ORDER in index.html (test/contracts/css-links.test.js). */
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: clamp(32px, 5.5vh, 96px);
+    animation: fadeIn 0.8s ease both;
+}
+
+.header h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(2rem, 5vh, 4.5rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent), #fff 50%, var(--accent));
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.5));
+}
+
+.header .sub {
+    font-size: 0.85rem;
+    letter-spacing: 0.5em;
+    color: var(--dim);
+    margin-top: 0.6em;
+    text-transform: uppercase;
+}
+
+/* Discreet clock in the top-right corner. Faint (--dim), scaled with the screen height (like the cards), z-index above the bottom-bar but
+   below the overlays (200+). */
+.clock {
+    position: fixed;
+    top: clamp(16px, 2.4vh, 48px);
+    right: clamp(20px, 3vh, 60px);
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    color: var(--dim);
+    font-family: var(--font-display);
+    line-height: 1;
+    pointer-events: none;
+}
+
+.clock-time {
+    font-size: clamp(1rem, 1.85vh, 2.4rem);
+    letter-spacing: 0.12em;
+    font-weight: 700;
+}
+
+.clock-date {
+    font-size: clamp(0.6rem, 1vh, 1.3rem);
+    letter-spacing: 0.18em;
+}
+
+/* Home-screen controller badge: below the header clock, every connected controller as a separate icon + battery %. Faint (--dim), scaled
+   with the screen height; a low battery is --accent2 (theme-dependent - a muted grey in oled). renderer/controller/controller-status.js. */
+.controller-status {
+    position: fixed;
+    top: clamp(52px, 6.5vh, 132px);
+    right: clamp(20px, 3vh, 60px);
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1.6vh, 20px);
+    pointer-events: none;
+}
+
+.ctrl-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--dim);
+}
+
+.ctrl-chip svg {
+    width: clamp(16px, 2.3vh, 32px);
+    height: clamp(16px, 2.3vh, 32px);
+}
+
+.ctrl-bat {
+    font-family: var(--font-display);
+    font-size: clamp(0.6rem, 1vh, 1.3rem);
+    letter-spacing: 0.06em;
+    line-height: 1;
+}
+
+.ctrl-bat.low {
+    color: var(--accent2);
+}
+
+/* PS+Square "which controller is which" flash (renderer/controller/controller-status.js flashControllerChip()) - reuses the existing
+   pulse-ring keyframe with a finite repeat (no standalone animation). */
+.ctrl-chip.flash {
+    animation: pulse-ring 0.4s ease-in-out 3;
+}
+
+/* Cards - carousel: the cards are absolutely positioned on the stage, layoutCarousel() sets their transform/opacity/z-index inline by the
+   ring offset measured from the focused card. 3 cards are always visible in the middle (center + left + right). */
+.cards {
+    position: relative;
+    width: 100%;
+    height: clamp(400px, 62vh, 1000px);
+    animation: fadeIn 0.6s ease both;
+}
+
+/* Carousel edge "peek" arrows: faint ◀ ▶ at the two edges of the screen, behind the outer cards (z-index: 0 -> inside .container the
+   cards, z 1-4, stay in front). Only visible if there are more launchers than fit the 3-card window — renderer/home/carousel.js
+   updateCarouselPeek() toggles [hidden]. `pointer-events: none`. The slow "breathing" stops automatically on [data-motion="off"] themes. */
+.carousel-peek {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 7vh, 6rem);
+    line-height: 1;
+    color: var(--dim);
+    opacity: 0.4;
+    pointer-events: none;
+    user-select: none;
+    animation: peek-breathe 2.4s ease-in-out infinite;
+}
+
+.carousel-peek-left {
+    left: clamp(6px, 2.5vh, 52px);
+}
+
+.carousel-peek-right {
+    right: clamp(6px, 2.5vh, 52px);
+}
+
+@keyframes peek-breathe {
+    0%, 100% {
+        opacity: 0.28;
+    }
+
+    50% {
+        opacity: 0.55;
+    }
+}
+
+.card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    /* initial transform (layoutCarousel overrides it inline) */
+    transform: translate(-50%, -50%) scale(0.66);
+    /* vh-based, so the card scales with the screen HEIGHT (not the width) - the displays actually used on the machine (2560x1080 ultrawide,
+           3840x2160 TV) are both 1080-or-2160 high, so both resolutions scale correctly with vh, no vmin needed. 55.6vh/44.4vh come from the
+           original 600px/480px @1080p reference (~0.8 ratio kept). */
+    height: clamp(360px, 55.6vh, 900px);
+    width: clamp(288px, 44.4vh, 720px);
+    background: var(--surface);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    cursor: none;
+    /* A mild "spring" — the 2nd control point of the cubic-bezier is > 1, so the card overshoots slightly, then settles. Under
+           data-motion=off the global :root[data-motion="off"] * rule turns it off anyway. */
+    transition: transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.3s ease, border-color 0.2s ease;
+    overflow: hidden;
+}
+
+/* Wrap teleport: while navigating, the "wrapping" card jumps to the other side for one frame without animation, so it does not swoosh
+   through the middle of the screen. */
+.card.no-anim,
+.card.no-anim .card-bg {
+    transition: none !important;
+}
+
+/* Blurred launcher icon as the card background (Steam-library-like ambient). z-index: -1 -> paints ABOVE the .card's `background:
+   var(--surface)` but BELOW the content (.card-icon / .card-name / badges) (the .card forms a stacking context because of the inline
+   transform of layoutCarousel()). `inset: -18%` + `overflow: hidden` on the .card: the blur edge does not hang out. Turned off per theme
+   with `--card-bg-opacity: 0`. */
+.card-bg {
+    position: absolute;
+    inset: -18%;
+    width: 136%;
+    height: 136%;
+    z-index: -1;
+    object-fit: cover;
+    filter: blur(clamp(12px, 1.8vh, 36px)) saturate(1.15);
+    opacity: var(--card-bg-opacity);
+    pointer-events: none;
+    /* Parallax: carousel.js moves the background opposite to the card's `p.x` by a FRACTION of it (setCardPos), so the blur layer "lags"
+           behind the card (sense of depth). Slower/softer than the card itself. */
+    transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A bit stronger on the focused card (ambient emphasis on the selected one). */
+.card.focused .card-bg {
+    opacity: calc(var(--card-bg-opacity) * 1.5);
+}
+
+/* Corner decorations */
+.card {
+    /* Per-launcher accent: the carousel puts an inline --card-accent on the focused card; it drives the glow color too. */
+    --focus-glow-color: var(--card-accent, var(--accent));
+}
+
+.card::before,
+.card::after {
+    content: '';
+    display: var(--corner-decor);
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-color: var(--card-accent, var(--accent));
+    border-style: solid;
+    opacity: 0.4;
+}
+
+.card::before {
+    top: 8px;
+    left: 8px;
+    border-width: 1px 0 0 1px;
+}
+
+.card::after {
+    bottom: 8px;
+    right: 8px;
+    border-width: 0 1px 1px 0;
+}
+
+/* The "size" comes from the carousel's scale (center scale(1) vs. outer scale(0.66)), so there is no transform here - only the focus
+   highlight. */
+.card.focused {
+    border-color: var(--card-accent, var(--accent));
+    box-shadow: var(--focus-shadow), inset 0 0 60px color-mix(in srgb, var(--card-accent, var(--accent)) 4%, transparent);
+}
+
+.card.focused::before,
+.card.focused::after {
+    opacity: 1;
+}
+
+/* Card icon area */
+.card-icon {
+    width: clamp(225px, 27.8vh, 562px);
+    height: clamp(225px, 27.8vh, 562px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.card-icon svg {
+    width: clamp(187px, 23.1vh, 468px);
+    height: clamp(187px, 23.1vh, 468px);
+    transition: filter 0.2s;
+}
+
+.card.focused .card-icon svg {
+    filter: drop-shadow(0 0 12px var(--card-accent, var(--accent)));
+}
+
+/* Focused: animated ring */
+.card.focused .card-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--card-accent, var(--accent));
+    opacity: 0.4;
+    animation: pulse-ring 2s linear infinite;
+}
+
+.card-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.63vh, 2.75rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text);
+    transition: color 0.2s;
+}
+
+.card.focused .card-name {
+    color: var(--card-accent, var(--accent));
+}
+
+.card-hint {
+    font-size: clamp(0.65rem, 0.963vh, 1.63rem);
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    text-transform: uppercase;
+}
+
+/* "Favorite" badge - on the card of the most launched launcher, see renderer/home/carousel.js favoriteLauncherId() */
+.card-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: clamp(0.6rem, 0.889vh, 1.5rem);
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 3px 8px;
+    opacity: 0.75;
+}
+
+/* "● RUNNING" badge - on the card of an already running launcher (top-left corner, so it fits next to the top-right "★ FAVORITE"), see
+   renderer/home/carousel.js */
+.card-running {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    font-size: clamp(0.6rem, 0.889vh, 1.5rem);
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: var(--running);
+    border: 1px solid var(--running);
+    border-radius: 3px;
+    padding: 3px 8px;
+    opacity: 0.85;
+}
+
+/* Press X indicator */
+.card .press-hint {
+    position: absolute;
+    bottom: 20px;
+    font-size: clamp(0.8rem, 1.185vh, 2rem);
+    letter-spacing: 0.2em;
+    color: var(--card-accent, var(--accent));
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.card.focused .press-hint {
+    opacity: 0.7;
+}
+
+/* Loading skeleton: the initial content of #cards (index.html) - 3 static, pulsing "empty cards" until initLaunchers() (renderer/main.js)
+   receives the real list over IPC. Pure CSS positioning, no JS: the translateX % is relative to the card's OWN width (CSS
+   transform-percentage rule), which matches the left/right ratio of computeCarouselPos() (carousel.js) (baseWidth * 0.71), since every
+   .card gets the same clamp()-ed width. renderCards() unconditionally overwrites the innerHTML of #cards once the real list arrives - the
+   skeleton disappears by itself, no removal JS. */
+.card-skeleton {
+    pointer-events: none;
+}
+
+.card-skeleton.pos-left {
+    transform: translate(-50%, -50%) translateX(-71%) scale(0.66);
+    opacity: 0.4;
+    z-index: 3;
+}
+
+.card-skeleton.pos-center {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    z-index: 4;
+}
+
+.card-skeleton.pos-right {
+    transform: translate(-50%, -50%) translateX(71%) scale(0.66);
+    opacity: 0.4;
+    z-index: 3;
+}
+
+/* Round icon placeholder (follows the .card-icon size) + text-bar placeholders (in place of .card-name / .card-hint) - the same shimmer
+   gradient + @keyframes skeleton-shimmer as the loader, so it paints correctly on all 15 themes without per-theme CSS. The global
+   :root[data-motion="off"] * rule stops this too (the "Animations" switch). */
+.skeleton-icon,
+.skeleton-bar {
+    background:
+        linear-gradient(90deg,
+            color-mix(in srgb, var(--dim) 12%, transparent) 25%,
+            color-mix(in srgb, var(--dim) 24%, transparent) 50%,
+            color-mix(in srgb, var(--dim) 12%, transparent) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.3s ease-in-out infinite;
+}
+
+.skeleton-icon {
+    width: clamp(187px, 23.1vh, 468px);
+    height: clamp(187px, 23.1vh, 468px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.skeleton-bar {
+    height: clamp(0.9rem, 1.3vh, 2.2rem);
+    border-radius: 4px;
+}
+
+.skeleton-bar-name {
+    width: 60%;
+}
+
+.skeleton-bar-hint {
+    width: 40%;
+}
+
+/* Quick-launch bar under the focused launcher card: up to 3 mini cover icons of the games most recently launched from that launcher. The
+   height is FIXED (min-height), so the carousel does not jump vertically between launchers - only the content appears/disappears. Below
+   .cards, in the flex column of .container. */
+.recent-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 1.5vh, 22px);
+    min-height: clamp(80px, 12vh, 190px);
+    margin-top: clamp(6px, 1.2vh, 20px);
+    animation: fadeIn 0.6s ease both;
+}
+
+.recent-game {
+    width: clamp(52px, 8vh, 128px);
+    height: clamp(78px, 12vh, 192px);
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius: 6px;
+    background: var(--surface);
+    overflow: hidden;
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recent-bar.bar-focused .recent-game {
+    opacity: 0.8;
+}
+
+.recent-game.focused {
+    opacity: 1;
+    border-color: var(--accent);
+    transform: scale(1.08);
+    box-shadow: 0 0 0 2px var(--accent), 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.recent-game > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.recent-game-noart {
+    font-size: clamp(0.5rem, 0.85vh, 1rem);
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--dim);
+    padding: 4px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+/* Global "▶ Continue" bar under the header: the last 3 games of ALL sources. Similar to the per-launcher .recent-bar but with SMALLER
+   covers (secondary chrome), and under the header (not under the carousel). Empty → [hidden]. */
+.continue-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1.2vh, 18px);
+    margin-bottom: clamp(10px, 1.8vh, 28px);
+    animation: fadeIn 0.6s ease both;
+}
+
+.continue-bar-label {
+    font-size: clamp(0.6rem, 1vh, 0.95rem);
+    letter-spacing: 0.22em;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-right: clamp(4px, 0.8vh, 12px);
+}
+
+.continue-game {
+    width: clamp(40px, 6vh, 96px);
+    height: clamp(60px, 9vh, 144px);
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius: 6px;
+    background: var(--surface);
+    overflow: hidden;
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.continue-bar.bar-focused .continue-game { opacity: 0.8; }
+
+.continue-game.focused {
+    opacity: 1;
+    border-color: var(--accent);
+    transform: scale(1.08);
+    box-shadow: 0 0 0 2px var(--accent), 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.continue-game > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* The Continue bar adds +1 row to the home screen — the header's bottom margin is narrowed then, so the 3 rows + carousel + bottom bar fit
+   at 1080p height too. */
+.container.has-continue .header {
+    margin-bottom: clamp(12px, 2vh, 36px);
+}
+
+:root[data-contrast="high"] .continue-game.focused {
+    outline: 3px solid var(--text);
+    outline-offset: 2px;
+}
+
+/* Bottom bar */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* vh-based like the other UI elements - not a hard floor independent of vh, so the bar (and the buttons in it) are proportionally bigger
+           on a bigger display and smaller on a smaller/lower one. */
+    min-height: clamp(56px, 6.7vh, 110px);
+    padding: 1.1em 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6em 2.2em;
+    background: linear-gradient(to top, rgba(4, 4, 10, 0.95), transparent);
+    /* An own vh clamp with a slightly bigger floor, INDEPENDENT of the global root rem chain (clamp(15px,1.481vh,34px)) - the hint text AND
+           (see .bottom-bar .btn-icon) the button icons compute from THIS size (em), not the global root rem, so they do not shrink too small on
+           a smaller/lower display. Only affects the bottom bar. */
+    font-size: clamp(0.9rem, 1.55vh, 1.15rem);
+    letter-spacing: 0.2em;
+    color: var(--dim);
+    z-index: 10;
+    transition: opacity 0.2s ease;
+}
+
+.bottom-bar .hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+/* The button icons here start from the .bottom-bar's OWN (vh-based, above) font size (em), NOT the global, root-rem-bound 0.7rem of
+   .btn-icon - otherwise scaling the bar's font-size would not affect the button circles (`rem` always goes to the root, never the nearest
+   parent). The multiplier (2.1em) is a bit bigger than the global 1.7em too, so the buttons stand out more next to the text. */
+.bottom-bar .btn-icon {
+    font-size: 1em;
+    width: 2.1em;
+    height: 2.1em;
+}
+
+/* Context-dependent hint bar: while a full overlay is open (Settings / Games panel — both `.settings-overlay` —, or the idle screensaver),
+   the main hint bar hides; the panel has its own `.settings-panel-hint`, the main nav is blocked anyway. `:has()` — Chromium 105+. */
+body:has(.settings-overlay.visible) .bottom-bar,
+body:has(.idle-overlay.visible) .bottom-bar {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Warmup indicator (renderer/home/warmup.js): the launcher's own (games.svg) icon, painted as a mask with the theme's accent color (the
+   file has no fill, as an <img> it would show black), rotating slowly in the bottom-left corner. JS handles the `hidden` attribute. Under
+   `data-motion=off` it stays static because of the global `animation: none` — that is fine (there is no opacity:0 fade-in that would get
+   stuck invisible). Hidden under a panel / the screensaver, like .bottom-bar. */
+.warmup-spinner {
+    position: fixed;
+    left: clamp(16px, 2.2vh, 46px);
+    bottom: clamp(16px, 2.2vh, 46px);
+    width: clamp(26px, 3.4vh, 64px);
+    height: clamp(26px, 3.4vh, 64px);
+    background: var(--accent);
+    mask: url("../assets/icons/games.svg") center / contain no-repeat;
+    opacity: 0.75;
+    pointer-events: none;
+    z-index: 11;
+    animation: warmup-spin 1.6s linear infinite;
+}
+
+@keyframes warmup-spin {
+    to { transform: rotate(360deg); }
+}
+
+body:has(.settings-overlay.visible) .warmup-spinner,
+body:has(.idle-overlay.visible) .warmup-spinner {
+    opacity: 0;
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* em -> the circle grows with its OWN font-size. `font-size: 0.7rem` here is always bound to the ROOT font size (`rem` never looks at the
+           nearest parent) - it scales with the global root rem chain (clamp(15px,1.481vh,34px)) on 4K too (~19px @1080, ~38px @2160),
+           REGARDLESS of which container the .btn-icon is in (Settings panel hint, card menu etc. - the desired, uniform size there).
+           .bottom-bar overrides THIS rule separately (.bottom-bar .btn-icon, see there) with an `em` starting from the bar's own size, so
+           scaling the bar's font-size affects the button circle too. */
+    width: 1.7em;
+    height: 1.7em;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    /* DELIBERATELY hardcoded (not --font-display): centering the button glyphs (✕ ○ △ □) in the circle is tuned to this font; themes override
+           it separately if needed. */
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    /* It would inherit the parent's (e.g. .bottom-bar, .settings-panel-hint) letter-spacing, which adds space AFTER the character - with flex
+           centering that shifts the visible glyph left of the circle's center. */
+    letter-spacing: normal;
+}
+
+.btn-x {
+    background: rgba(0, 229, 255, 0.15);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.btn-ps {
+    background: rgba(255, 61, 110, 0.1);
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+}
+
+
+/* "No controller" hint: a non-modal bar above the bottom bar. */
+.no-pad-hint {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--bottom-bar-h, 60px) + 1.2em);
+    transform: translateX(-50%);
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    padding: 0.6em 1em;
+    max-width: 90vw;
+    font-size: 0.85rem;
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+}
+
+.no-pad-hint[hidden] { display: none; }
+
+.no-pad-link, .no-pad-close {
+    font: inherit;
+    color: var(--accent);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+}
+
+.no-pad-link { text-decoration: underline; }
+
+/* The "BACK to the game" item of the Continue bar: a highlighted frame + a caption on the cover. */
+.continue-game.continue-resume {
+    position: relative;
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.continue-resume-tag {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 0.15em 0.3em;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    color: var(--bg, #000);
+    background: var(--accent);
+}
+
+/* The blurred cover of the focused Continue item in the background: above .bg-glow / #bgCustom, below the content; only visible for a
+   focused item with a cover. */
+#continueBackdrop {
+    position: fixed;
+    inset: -6%;
+    z-index: 0;
+    background-position: center;
+    background-size: cover;
+    filter: blur(clamp(24px, 4vh, 70px)) saturate(1.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+}
+
+#continueBackdrop.active {
+    opacity: 0.32;
+}
+
+:root[data-motion="off"] #continueBackdrop {
+    transition: none;
+}

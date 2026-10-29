@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Full gate: `npm test` + shellcheck (the latter from the npx cache — not a devDependency,
+# so the kiosk's `npm install` does not pull it in; skipped without network).
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+# shellcheck source=.githooks/lib.sh
+. .githooks/lib.sh
+if ! run_tests "test/**/*.test.js" > /tmp/launchers-launcher-pre-push.$$ 2>&1; then
+    grep -E '^not ok|^# (pass|fail)' /tmp/launchers-launcher-pre-push.$$ >&2 || true
+    rm -f /tmp/launchers-launcher-pre-push.$$
+    echo "[pre-push] the tests fail (full output: npm test)" >&2
+    exit 1
+fi
+rm -f /tmp/launchers-launcher-pre-push.$$
+if command -v npx >/dev/null 2>&1; then
+    npm run --silent lint:shell || { echo "[pre-push] shellcheck error" >&2; exit 1; }
+fi

@@ -1,0 +1,8 @@
+[
+  { "id": "aurora", "label": "Aurora", "swatch": ["#0a1a33", "#1c6e8c"] },
+  { "id": "dusk", "label": "Dusk", "swatch": ["#1a0f2e", "#7b3fa0"] },
+  { "id": "nebula", "label": "Nebula", "swatch": ["#0c0c1a", "#c04a7a"] },
+  { "id": "carbon", "label": "Carbon", "swatch": ["#131316", "#2a2a30"] },
+  { "id": "forest", "label": "Forest", "swatch": ["#0a1f14", "#2f7d4f"] },
+  { "id": "ember", "label": "Ember", "swatch": ["#1f0a06", "#c2521a"] }
+]

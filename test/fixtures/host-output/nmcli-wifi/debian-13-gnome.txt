@@ -1,0 +1,7 @@
+no:Net-1:100:WPA2
+yes:Net-2:79:WPA2
+no:Net-3:74:WPA2
+no:Net-4:35:WPA2 WPA3
+no:Net-5:35:WPA2
+no:Net-6:20:WPA2
+no:Net-7:19:

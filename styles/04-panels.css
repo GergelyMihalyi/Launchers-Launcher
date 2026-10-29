@@ -1,0 +1,614 @@
+/* styles/04-panels.css — Panels: Settings (and the shared .settings-overlay/.settings-panel based popups), subview items, installer,
+   "What's new", empty state, launcher icon loader. The styles/NN-*.css files load in NUMERIC ORDER in index.html
+   (test/contracts/css-links.test.js). */
+/* Settings icon + the active audio device's name. TOP LEFT corner - the top-right area is taken by the header clock + the controller badge
+   (renderer/controller/controller-status.js). */
+.settings-icon-btn {
+    position: fixed;
+    top: clamp(16px, 2.2vh, 46px);
+    left: clamp(16px, 2.2vh, 46px);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 0.75em;
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 4px;
+    background: rgba(13, 13, 26, 0.6);
+    cursor: none;
+}
+
+.settings-icon-btn svg {
+    width: 1.3em;
+    height: 1.3em;
+    fill: var(--dim);
+}
+
+.settings-icon-btn .audio-current-name {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+    text-transform: uppercase;
+    max-width: 12em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Settings panel - menu + subviews (e.g. audio output) */
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 210;
+    background: rgba(4, 4, 10, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+/* Panel entry: the backdrop fades, the panel itself gently "grows" (scale). Under [data-motion="off"] the global rule snaps it. */
+.settings-overlay .settings-panel {
+    transform: scale(0.96);
+    opacity: 0;
+    transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
+}
+
+.settings-overlay.visible .settings-panel {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.settings-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Base size — for the smaller popup menus (card quick menu, quick system menu, "What's new" etc., see index.html: they all reuse the same
+   `.settings-panel` class) it stays content-driven (`max-height`, not a fixed `height`) — the big panels with many subviews/views
+   (Settings, Games) have a fixed size, see `#settingsOverlay` / `#gamesOverlay` below. */
+.settings-panel {
+    /* @1080 = 480px, @2160 ~960px */
+    width: min(92vw, clamp(480px, 44.4vh, 960px));
+    max-height: 82vh;
+    background: var(--surface);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 4px;
+    box-shadow: var(--focus-shadow);
+    padding: 1.5em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+/* The Settings panel (many subviews, always two columns, see .settings-body below) has a fixed size — when switching between subviews the
+   box must not "jump" with the content length; the inner lists (#settingsMenuList / #settingsContent) scroll within the fixed height. The
+   width is enough for the left (menu) + right (subview) columns at 1080p too. @1080 = 760px, @2160 ~1180px / 76vh high. */
+#settingsOverlay .settings-panel {
+    width: min(92vw, clamp(760px, 70.4vh, 1180px));
+    height: clamp(560px, 76vh, 960px);
+    max-height: none;
+}
+
+.settings-panel-title {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-align: center;
+}
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    overflow-y: auto;
+    /* The panel's max-height is 82vh; in a flex column the list only becomes a scrollable container (not overflowing at the bottom) if it is
+           allowed to shrink below its content. */
+    flex: 1;
+    min-height: 0;
+}
+
+/* --- Two-column Settings, ALWAYS --- */
+/* #settingsBody is the shared container of the menu (left) + the subview (right) — because of the fixed size of .settings-panel (above)
+   both columns always fit, there is no single-column fallback. */
+.settings-body {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    gap: 1.5em;
+}
+
+.settings-body > #settingsMenuList {
+    flex: 0 0 32%;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    padding-right: 1em;
+}
+
+.settings-body > #settingsContent {
+    flex: 1;
+}
+
+.settings-item {
+    padding: 0.7em 1em;
+    border: 1px solid rgba(0, 229, 255, 0.1);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--text);
+    letter-spacing: 0.05em;
+}
+
+.settings-item.focused {
+    border-color: var(--accent);
+    background: rgba(0, 229, 255, 0.08);
+    color: var(--accent);
+}
+
+/* Settings menu: the one-line explanation of the focused row */
+.settings-item-desc {
+    display: block;
+    margin-top: 0.35em;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    opacity: 0.7;
+}
+
+/* Launcher order: highlighting the "picked up" (moved) item */
+.settings-item.grabbed {
+    border-color: var(--accent);
+    border-style: dashed;
+    background: rgba(0, 229, 255, 0.14);
+    color: var(--accent);
+    transform: scale(1.02);
+}
+
+/* Power management subview: the row waiting for the 2nd ✕ ("✕ AGAIN") — a warning color. */
+.settings-item.armed {
+    border-color: var(--accent2);
+    background: rgba(255, 61, 110, 0.12);
+    color: var(--accent2);
+}
+
+.audio-current-tag {
+    color: var(--dim);
+    font-size: 0.7rem;
+}
+
+.settings-item.focused .audio-current-tag {
+    color: var(--accent);
+}
+
+/* Theme subview: a preview strip (bg / surface / accent) before the theme row. renderThemeList() gives the colors as inline style from the
+   manifest's swatch. */
+.theme-swatch {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-right: 0.7em;
+    border: 1px solid var(--dim);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.theme-swatch>span {
+    display: block;
+    width: 1em;
+    height: 1em;
+}
+
+/* Icon picker: a mini icon at the start of the row. */
+.launcher-icon-thumb {
+    width: 1.5em;
+    height: 1.5em;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 0.6em;
+}
+
+/* "+ Add launcher" wizard: the card preview at the top of the preview step + a sample dot of the chosen accent color. */
+.launcher-add-preview {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin: 0.4em 0 0.8em;
+    padding: 0.8em 1em;
+    border: 2px solid var(--preview-accent, var(--accent));
+    border-radius: var(--card-radius);
+    background: var(--surface);
+}
+
+.launcher-add-preview img {
+    width: 3.2em;
+    height: 3.2em;
+    object-fit: contain;
+    flex: none;
+}
+
+.launcher-add-preview-name {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.launcher-add-swatch {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    vertical-align: middle;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* "NOT INSTALLED" marker in the Launchers subview (catalog) */
+/* Log subview: highlighting errors / warnings. */
+.settings-item.log-error {
+    color: var(--accent2);
+    border-left: 3px solid var(--accent2);
+}
+
+.settings-item.log-warn {
+    color: #ffb454;
+}
+
+.tag-warn {
+    color: #ffb454;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+/* BT device rows (headphones / controller subview) */
+.bt-icon {
+    display: inline-flex;
+    width: 1.5em;
+    height: 1.5em;
+    margin-right: 0.7em;
+    vertical-align: middle;
+    color: var(--dim);
+}
+
+.bt-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.settings-item.focused .bt-icon {
+    color: var(--accent);
+}
+
+.bt-name {
+    vertical-align: middle;
+}
+
+/* Wi-Fi subview (renderer/settings/settings-wifi.js): a 4-step signal-strength bar before the SSID. */
+.wifi-bars {
+    display: inline-block;
+    margin-right: 0.7em;
+    vertical-align: middle;
+    letter-spacing: 0;
+    color: var(--dim);
+}
+
+.settings-item.focused .wifi-bars {
+    color: var(--accent);
+}
+
+.wifi-bars-dim {
+    opacity: 0.25;
+}
+
+/* The last failed connect's reason on the network's row (renderer/settings/settings-wifi.js rowError) — the toast alone was easy to miss. */
+.wifi-error-tag {
+    color: var(--accent2);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.bt-disamb {
+    color: var(--dim);
+    font-size: 0.7rem;
+}
+
+.settings-item.focused .bt-disamb {
+    color: var(--accent);
+}
+
+.settings-subhead {
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding: 10px 4px 2px;
+}
+
+/* Settings left column (settings.js renderCategoryList) — the top-level items (categories) stacked, ALWAYS. `.active` = this category is
+   being previewed on the right (marked even when the focus is already on the item list/content — 'items'/'content' zone); `.focused` (the
+   base rule of `.settings-item`) only goes with the 'categories' zone. */
+.settings-item.active:not(.focused) {
+    color: var(--accent);
+    border-color: rgba(0, 229, 255, 0.35);
+}
+
+.settings-item-readonly {
+    opacity: 0.55;
+    border-style: dashed;
+}
+
+.settings-empty {
+    text-align: center;
+    color: var(--dim);
+    font-size: 0.8rem;
+    padding: 20px 0;
+}
+
+/* In-app flatpak installer (renderer/launcher-install.js). */
+.li-status {
+    text-align: center;
+    padding: 0.6em 0 1em;
+    font-size: 0.95rem;
+}
+
+.li-cmd {
+    text-align: center;
+    font-family: var(--font-body, monospace);
+    font-size: 0.8rem;
+    color: var(--dim);
+    padding-bottom: 1em;
+    word-break: break-all;
+}
+
+.li-bar {
+    height: 0.9em;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    overflow: hidden;
+    margin: 0.4em auto;
+    max-width: 24em;
+}
+
+.li-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+}
+
+/* Until a % arrives (flatpak is pulling the metadata / the remote): a pulsing bar. */
+.li-bar-indeterminate {
+    animation: li-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes li-pulse {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 1; }
+}
+
+.li-pct {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--dim);
+}
+
+/* "What's new" panel (renderer/changelog.js) — informational, non-focusable rows: `### X` subheader (settings-subhead), `- item` bullet, any
+   other line a paragraph. */
+.changelog-item {
+    position: relative;
+    padding-left: 1.4em;
+}
+
+.changelog-item::before {
+    content: "▹";
+    position: absolute;
+    left: 0.3em;
+    color: var(--accent);
+}
+
+.changelog-para {
+    color: var(--dim);
+    font-size: 0.82rem;
+    padding: 0.3em 0;
+}
+
+/* Uniform empty state (renderer/util.js emptyState): title + an optional explanation/"○ BACK" line, centered. */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+    padding: clamp(16px, 4vh, 48px) 0;
+}
+
+.empty-state-title {
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
+}
+
+.empty-state-hint {
+    font-size: 0.78rem;
+    opacity: 0.72;
+}
+
+/* Launcher icon loader (renderer/util.js launcherLoaderHtml / loadingBlock): the icons of the active launchers in a row, lighting up one
+   after another in a WAVE (`--i` = the icon's index → a staggered animation-delay). Only transform / opacity (the drop-shadow only at the
+   peak) → cheap. Color only from a token (--accent) → works on all 15 themes without theme CSS. The sizes are vh-clamp()s (the carousel
+   convention). FLICKER GUARD: the component fades in from opacity:0 with a 150 ms delay (pure CSS, no JS timer), so for panel loads of a
+   few ms the content replaces it before anything shows. `.launcher-loader-now` = no delay/fade (launch overlay, refresh, installer, BT
+   search: long and/or often redrawn places). */
+.launcher-loader {
+    --loader-size: clamp(36px, 5vh, 90px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--loader-size) * 0.35);
+    margin: 1em auto;
+    max-width: 100%;
+    opacity: 0;
+    animation: launcher-loader-in 0.2s ease 0.15s forwards;
+    pointer-events: none;
+}
+
+.launcher-loader:only-child {
+    margin: auto;
+}
+
+.launcher-loader-sm {
+    --loader-size: clamp(20px, 2.6vh, 48px);
+}
+
+.launcher-loader-lg {
+    --loader-size: clamp(56px, 8vh, 140px);
+}
+
+.launcher-loader-now {
+    opacity: 1;
+    animation: none;
+}
+
+.loader-icon {
+    /* In a narrow container (the Settings right column) the icons move proportionally closer, they do not overflow / create a scrollbar. */
+    flex: 0 1 var(--loader-size);
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    /* Base state (data-motion="off": the animation does not run) - static but readable. */
+    opacity: 0.8;
+    animation: launcher-loader-wave 1.3s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+}
+
+/* The launched launcher's icon: highlighted, not pulsing (the launch overlay's "what is starting" signal). */
+.loader-icon-active {
+    animation: none;
+    opacity: 1;
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 0.7em var(--accent));
+}
+
+@keyframes launcher-loader-in {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes launcher-loader-wave {
+
+    0%,
+    100% {
+        opacity: 0.35;
+        transform: scale(0.86);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.12);
+        filter: drop-shadow(0 0 0.6em var(--accent));
+    }
+}
+
+/* data-motion="off": the global `animation: none !important` stops the fade-in too, and the component would get stuck at opacity:0 - so it
+   is forced visible here. */
+:root[data-motion="off"] .launcher-loader {
+    opacity: 1;
+}
+
+/* Startup skeleton (index.html #cards): the icons of the preload's `initialLauncherIcons` go into the circle placeholders
+   (renderer/boot/boot-cards.js), waving faintly. */
+.skeleton-icon .loader-icon {
+    flex: none;
+    width: 58%;
+    height: 58%;
+    aspect-ratio: auto;
+}
+
+/* The shimmer keyframes are needed for the .card-skeleton circle/bar placeholders (above). skeletonList() returns the launcher icon loader. */
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 150% 0;
+    }
+
+    100% {
+        background-position: -150% 0;
+    }
+}
+
+.settings-panel-hint {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 24px;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    text-transform: uppercase;
+}
+
+/* The setup wizard's welcome step: the logo (wordmark) above the intro text. */
+.wizard-logo {
+    display: block;
+    height: 22vh;
+    max-height: 220px;
+    margin: 0 auto 0.5em;
+}
+
+/* Button layout help (renderer/controller/controller-help.js) — the grid of the wizard's "Button layout" step (one column per section) AND
+   the rows of the Settings subview. The wizard panel is only wider for this step (`:has`), the other steps keep their size. */
+#setupOverlay .settings-panel:has(.controls-help) {
+    width: min(92vw, clamp(760px, 70.4vh, 1180px));
+}
+
+.controls-help {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17em, 1fr));
+    gap: 0.4em 1.6em;
+}
+
+.controls-help-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    padding: 0.25em 0;
+}
+
+.controls-help-keys {
+    flex: 0 0 auto;
+    min-width: 4.6em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15em;
+    margin-right: 0.6em;
+}
+
+.controls-help-plus {
+    color: var(--dim);
+    font-size: 0.8em;
+    margin: 0 0.1em;
+}
+
+.controls-help-label {
+    color: var(--accent);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.controls-help-text {
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.wiz-check {
+    display: inline-block;
+    text-align: left;
+}
+
+/* Settings search: the result list stays above the docked keyboard (the Games panel pattern). */
+#settingsOverlay.kb-docked .settings-panel {
+    padding-bottom: calc(1.5em + var(--kb-h, 0px));
+}
+
+#settingsOverlay.kb-docked #settingsPanelHint {
+    display: none;
+}

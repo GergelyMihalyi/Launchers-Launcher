@@ -1,0 +1,30 @@
+{
+    "//": "Build-free type checking — `npm run typecheck` / `test/contracts/typecheck.test.js`. No transpile, `npm start` is untouched.",
+    "compilerOptions": {
+        "checkJs": true,
+        "allowJs": true,
+        "noEmit": true,
+        "module": "node16",
+        "moduleResolution": "node16",
+        "target": "es2022",
+        "lib": [
+            "es2023"
+        ],
+        "types": [
+            "node"
+        ],
+        "resolveJsonModule": true,
+        "strict": false,
+        "noUnusedLocals": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "lib/**/*.js",
+        "controller-id.js",
+        "launcher-registry.js",
+        "preload.js",
+        "main.js",
+        "bootstrap.js"
+    ]
+}

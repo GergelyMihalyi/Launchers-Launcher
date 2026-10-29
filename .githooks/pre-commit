@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Fast gate (~15 s): the repo-level contract tests (IPC, i18n, DOM ids, launcher tables,
+# timeouts, typecheck, …). The full test suite runs in pre-push.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+# shellcheck source=.githooks/lib.sh
+. .githooks/lib.sh
+run_tests "test/contracts/*.test.js" >/dev/null 2>&1 || {
+    echo "[pre-commit] the contract tests fail — details:" >&2
+    run_tests "test/contracts/*.test.js" 2>&1 | grep -E '^not ok|^# (pass|fail)' >&2
+    exit 1
+}

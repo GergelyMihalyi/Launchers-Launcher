@@ -1,0 +1,34 @@
+/* "PlayStation 2" (ps2) theme — the mood of the PS2 main menu: a black → dark blue vertical gradient, faintly floating blue "bubbles", a
+   subtle blue accent. An additive override, every rule nested under :root[data-theme="ps2"]. Font: the neon base's (no @import). */
+
+:root[data-theme="ps2"] {
+    --bg: #01012b;
+    --surface: #0a0a3a;
+    --accent: #4a9eff;
+    /* PS blue */
+    --accent2: #8ab8ff;
+    --text: #cdd9f0;
+    --dim: #5a6a9a;
+    --running: #5ad1a0;
+
+    --focus-shadow: 0 0 20px color-mix(in srgb, var(--focus-glow-color) 35%, transparent);
+    --focus-shadow-danger: 0 0 20px rgba(255, 61, 110, 0.4);
+
+    --scanline-opacity: 0;
+    --ambient:
+        radial-gradient(circle at 20% 28%, rgba(74, 158, 255, 0.1) 0%, transparent 12%),
+        radial-gradient(circle at 76% 58%, rgba(74, 158, 255, 0.08) 0%, transparent 10%),
+        radial-gradient(circle at 52% 84%, rgba(74, 158, 255, 0.07) 0%, transparent 14%),
+        linear-gradient(180deg, #000016 0%, #01012b 55%, #050545 100%);
+    --card-radius: 4px;
+    --card-border: 1px solid rgba(74, 158, 255, 0.22);
+    --corner-decor: none;
+    --card-bg-opacity: 0.16;
+
+    & .header h1 {
+        background: none;
+        -webkit-text-fill-color: var(--accent);
+        filter: drop-shadow(0 0 24px rgba(74, 158, 255, 0.45));
+        letter-spacing: 0.22em;
+    }
+}

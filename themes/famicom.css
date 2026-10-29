@@ -1,0 +1,43 @@
+/* "Famicom" (famicom) theme — a retro Japanese console box: cream base, crimson + gold accent, rounded cards, soft shadow (no glow). A light
+   theme. An additive override, every rule nested under :root[data-theme="famicom"]. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+:root[data-theme="famicom"] {
+    --bg: #f2e8d5;
+    --surface: #fbf5e9;
+    --accent: #b3122b;
+    /* Famicom crimson */
+    --accent2: #c9a227;
+    /* gold */
+    --text: #3a2e26;
+    --dim: #9a8b78;
+    --running: #1f7a3d;
+
+    --font-body: 'Fredoka', 'Trebuchet MS', sans-serif;
+    --font-display: 'Fredoka', sans-serif;
+
+    --focus-shadow: 0 8px 22px rgba(179, 18, 43, 0.22);
+    --focus-shadow-danger: 0 8px 22px rgba(179, 18, 43, 0.32);
+
+    --scanline-opacity: 0;
+    --ambient:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(179, 18, 43, 0.06) 0%, transparent 60%),
+        linear-gradient(180deg, #f5ecdb 0%, #efe3cc 100%);
+    --card-radius: 20px;
+    --card-border: 3px solid #e6d8bf;
+    --corner-decor: none;
+    --card-bg-opacity: 0.1;
+
+    & .header h1 {
+        background: none;
+        -webkit-text-fill-color: var(--accent);
+        filter: drop-shadow(0 2px 0 rgba(201, 162, 39, 0.45));
+        letter-spacing: 0.1em;
+    }
+
+    /* Light theme: the faint cyan inset layer of styles/*.css is removed next to the token glow. */
+    & .card.focused {
+        box-shadow: var(--focus-shadow);
+    }
+}

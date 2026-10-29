@@ -1,0 +1,4 @@
+com.github.tchx84.Flatseal	Flatseal
+com.spotify.Client	Spotify
+io.github.kolunmi.Bazaar	Bazár
+org.telegram.desktop	Telegram

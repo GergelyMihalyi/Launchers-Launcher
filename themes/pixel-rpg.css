@@ -1,0 +1,334 @@
+/* "Pixel RPG" (pixel-rpg) theme — a 16-bit JRPG mood: a midnight-blue world-map base, navy "message window" panels with a light blue
+   border, a gold cursor/selection (▶), a pixel font, sharp corners, a faint CRT scanline. The focus is marked by solid gold + a dark pixel
+   border pair (no neon glow). An additive override above styles/*.css, every rule nested under :root[data-theme="pixel-rpg"] (native CSS
+   nesting) — only live with <html data-theme="pixel-rpg">.
+
+   Font: Pixelify Sans (a readable pixel font) for body + display, with a VT323 fallback — a single Google Fonts @import (the CSP allows
+   fonts.googleapis.com). NO `motion: "off"` in the manifest — the carousel slide + the soft fades stay. */
+
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+
+:root[data-theme="pixel-rpg"] {
+    --bg: #0b1021;
+    /* midnight-blue world map (loading overlay + solid fallback) */
+    --surface: #1c2444;
+    /* navy message window */
+    --accent: #f6c945;
+    /* RPG gold — cursor / selection / focus border */
+    --accent2: #e5533d;
+    /* wound red — warning / TV mute / exit progress */
+    --text: #e8e4d0;
+    /* parchment white */
+    --dim: #8a8fb0;
+    /* muted lavender grey */
+    --running: #7fc95a;
+    /* slime green ("● RUNNING" badge) */
+
+    --font-body: 'Pixelify Sans', 'VT323', 'Share Tech Mono', monospace;
+    --font-display: 'Pixelify Sans', 'VT323', 'Share Tech Mono', monospace;
+
+    /* A solid gold selection border with a dark inner frame line (RPG window border pair), no glow. Because of the flat --focus-shadow the
+           per-launcher --card-accent glow is skipped automatically (like win31/oled) — the `& .card` below fixes the palette anyway. */
+    --focus-shadow: 0 0 0 2px var(--bg), 0 0 0 5px var(--accent);
+    --focus-shadow-danger: 0 0 0 2px var(--bg), 0 0 0 5px var(--accent2);
+
+    --scanline-opacity: 0.05;
+    /* A star glow at the top + a subtle navy dither check (the texture of the pixel world) + a vignette at the bottom. */
+    --ambient:
+        radial-gradient(ellipse 90% 55% at 50% 0%, rgba(120, 150, 240, 0.14) 0%, transparent 65%),
+        linear-gradient(45deg, rgba(255, 255, 255, 0.025) 25%, transparent 25% 50%, rgba(255, 255, 255, 0.025) 50% 75%, transparent 75%) 0 0 / 32px 32px,
+        linear-gradient(180deg, #0d1226 0%, #090d1c 100%);
+    --card-radius: 0;
+    /* pixel window: sharp corner */
+    --card-border: 14px solid #4a5a9c;
+    /* the actual pattern comes from border-image (see & .card below) - this is only the width + the fallback color if the border-image source
+           somehow did not load */
+    --corner-decor: none;
+    /* the corner decoration is inside the border-image frame (all 4 corners), the generic ::before/::after 2-corner bracket mechanism is off
+           here */
+    --card-bg-opacity: 0;
+    /* a flat navy window — the blurred background icon would look "dirty" on it */
+
+    /* A pixelated JRPG world-map scene in the .bg-glow layer (the xp "Bliss" pattern: a self-contained unit of the theme in themes/, the
+           relative url() resolves relative to the stylesheet). A vector SVG (only right-angled rectangles), so it stays sharp at any resolution
+           - no image-rendering: pixelated trick (that would be needed for raster sources). A darkening gradient for the readability of the card
+           hints, --ambient is the final fallback if the image is missing. */
+    & .bg-glow {
+        background:
+            linear-gradient(180deg, rgba(6, 9, 20, 0.2) 0%, rgba(6, 9, 20, 0.58) 100%),
+            url("pixel-rpg-map.svg") center bottom / cover no-repeat,
+            var(--ambient);
+    }
+
+    /* Header = a pixelated title screen: solid gold + a hard (unblurred) pixel shadow. */
+    & .header h1 {
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        background: none;
+        -webkit-text-fill-color: var(--accent);
+        filter: drop-shadow(3px 3px 0 var(--bg)) drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.4));
+    }
+
+    & .header .sub {
+        color: var(--accent);
+        opacity: 0.22;
+    }
+
+    /* Card = RPG message window: a flat navy base + a pixel-art border-image frame (all 4 edges + all 4 corners, on EVERY card — not only the
+           focused one). The border-image source is themes/pixel-rpg-border.svg (48x48, a 3x3 grid of 16px, the center tile dropped — the card's
+           own background shows there). `border-image-slice: 16` refers to the source's OWN (intrinsic, from the width/height attributes) pixel
+           grid, NOT the displayed `border-image-width` — the two are independent (16px source tile → 14px displayed width, slightly scaled down,
+           without loss of sharpness for a vector source). `border-color`/`border-style` (from the --card-border token) would only matter if the
+           border-image source did not load — normally border-image overrides the visual appearance. */
+    & .card {
+        --card-accent: var(--accent) !important;
+        background: linear-gradient(180deg, #232c52 0%, #1a2142 100%);
+        box-shadow: inset 0 0 0 2px var(--bg);
+        border-image-source: url("pixel-rpg-border.svg");
+        border-image-slice: 16;
+        border-image-width: 14px;
+        border-image-repeat: round;
+    }
+
+    /* The focus marker is a separate gold glowing ring (--focus-shadow) ABOVE the pixel border — the border-image itself does not change on
+           focus (a static image), border-color only stays for the image-load fallback. */
+    & .card.focused {
+        box-shadow: var(--focus-shadow), inset 0 0 0 2px var(--bg);
+    }
+
+    & .card.focused .card-icon svg {
+        filter: none;
+    }
+
+    /* The base focus ring of styles/*.css (.card.focused .card-icon::after) is a plain, antialiased border-radius:50% circle — here it is
+           replaced with a hand-drawn PIXEL ring based on a Bresenham circle (themes/pixel-rpg-ring.svg, the pixel-rpg-border.svg pattern: vector
+           rects with shape-rendering="crispEdges", so it stays sharp and stepped even under the pulsing scale-up [pulse-ring keyframe,
+           styles/*.css, UNCHANGED], like the pixel font of the carousel peek arrows — no image-rendering:pixelated raster trick needed). */
+    & .card.focused .card-icon::after {
+        border: none;
+        border-radius: 0;
+        background: url("pixel-rpg-ring.svg") center / contain no-repeat;
+    }
+
+    /* The "pixel-art" effect of launcher icons — the actual pixelation comes from JS (renderer/home/carousel.js
+           `pixelateIconUrl`/`pixelateCardIcon`): the image is drawn onto a small <canvas> (PIXEL_ICON_GRID = 12×12, a real bitmap), and the data
+           URL made FROM IT is given to the `<img>` (not the original SVG/PNG). Here only the nearest-neighbor upscale is needed:
+           `image-rendering: pixelated` stretches the 12×12 bitmap blockily to the normal `.app-icon` size (styles/*.css
+           `clamp(128px, 11.9vh, 300px)`).
+           ⚠️ HISTORY — why the pure CSS trick (small width/height + transform: scale + image-rendering: pixelated on the ORIGINAL image) is not
+           enough: the launcher icon sources are mixed (the `steam`/`retroarch` icons are **SVG**, vector; the rest PNG). Chromium can redraw
+           vector sources smoothly at the FINAL (scaled-up) resolution, skipping the intermediate small raster step — even with `will-change:
+           transform` —, so the blocky effect did not appear. A `calc(var(--a) / var(--b))` (dividing two lengths) also failed earlier (the
+           `scale()` argument became silently invalid, the icon got stuck in the shrunk box). The JS-based real small bitmap avoids both
+           problems: there is nothing to cleverly re-vectorize, and no runtime length division. Only applies to the pixel-rpg theme — on other
+           themes the plain, sharp icon stays. */
+    & .app-icon {
+        image-rendering: pixelated;
+    }
+
+    /* Card name: gold when focused, preceded by the classic ▶ selection cursor. */
+    & .card-name {
+        letter-spacing: 0.1em;
+        color: var(--text);
+    }
+
+    & .card.focused .card-name {
+        color: var(--accent);
+    }
+
+    & .card.focused .card-name::before {
+        content: '\25B6';
+        margin-right: 0.45em;
+        color: var(--accent);
+    }
+
+    & .card-hint,
+    & .card .press-hint {
+        letter-spacing: 0.08em;
+    }
+
+    /* Bottom bar */
+    & .bottom-bar {
+        background: linear-gradient(180deg, #141a33 0%, #0d1122 100%);
+        border-top: 3px solid #4a5a9c;
+        color: var(--text);
+        letter-spacing: 0.06em;
+    }
+
+    & .btn-icon {
+        border-radius: 0;
+        border-width: 2px;
+        border-style: solid;
+    }
+
+    & .btn-x,
+    & .btn-triangle {
+        background: linear-gradient(180deg, #2e3a6c, #1c2444);
+        color: var(--accent);
+        border-color: #4a5a9c;
+    }
+
+    & .btn-ps,
+    & .btn-square {
+        background: linear-gradient(180deg, #2e3a6c, #1c2444);
+        color: var(--text);
+        border-color: #4a5a9c;
+    }
+
+    & .status {
+        color: var(--text);
+        letter-spacing: 0.08em;
+    }
+
+    & .status.error {
+        color: var(--accent2);
+    }
+
+    /* Settings icon + panel = RPG menu window */
+    & .settings-icon-btn {
+        background: linear-gradient(180deg, #2e3a6c, #1c2444);
+        border: 2px solid #4a5a9c;
+        border-radius: 0;
+    }
+
+    & .settings-icon-btn svg {
+        fill: var(--accent);
+    }
+
+    & .settings-icon-btn .audio-current-name {
+        color: var(--text);
+    }
+
+    & .settings-overlay {
+        background: rgba(5, 8, 18, 0.72);
+    }
+
+    & .settings-panel {
+        background: var(--surface);
+        border: 3px solid #6b7bc0;
+        border-radius: 0;
+        box-shadow: 0 0 0 3px var(--bg), 0 16px 0 rgba(0, 0, 0, 0.45);
+    }
+
+    & .settings-panel-title {
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        border-bottom: 2px solid #4a5a9c;
+        padding-bottom: 0.4em;
+    }
+
+    & .settings-list {
+        background: #141a33;
+        border: 2px solid #4a5a9c;
+    }
+
+    & .settings-item {
+        position: relative;
+        border-radius: 0;
+        border: 2px solid transparent;
+        padding-left: 2.2em;
+        color: var(--text);
+        letter-spacing: 0.03em;
+    }
+
+    /* Selected row = RPG menu cursor: gold text + ▶ prefix, a faint gold background. */
+    & .settings-item.focused {
+        border-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+        color: var(--accent);
+    }
+
+    & .settings-item.focused::before {
+        content: '\25B6';
+        position: absolute;
+        left: 0.7em;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--accent);
+    }
+
+    & .settings-item.grabbed {
+        border: 2px dashed var(--accent);
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        color: var(--accent);
+        transform: none;
+    }
+
+    & .settings-item.focused .bt-icon,
+    & .settings-item.focused .bt-disamb,
+    & .settings-item.focused .audio-current-tag,
+    & .settings-item.focused .tag-warn {
+        color: var(--accent);
+    }
+
+    & .settings-subhead {
+        color: var(--dim);
+        letter-spacing: 0.08em;
+    }
+
+    & .settings-panel-hint {
+        color: var(--dim);
+    }
+
+    & .game-cell.focused,
+    & .recent-game.focused {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    /* Overlays — pixel-flat bars (no glow, sharp corner) */
+    & .loading-overlay {
+        background: var(--bg);
+    }
+
+    & .loading-text {
+        color: var(--accent);
+        letter-spacing: 0.12em;
+    }
+
+    & .volume-overlay {
+        border-radius: 0;
+        border: 3px solid #6b7bc0;
+        background: var(--surface);
+        box-shadow: 0 0 0 3px var(--bg);
+    }
+
+    & .volume-label,
+    & .volume-percent {
+        color: var(--text);
+    }
+
+    & .volume-track {
+        border-radius: 0;
+        background: #141a33;
+        border: 2px solid #4a5a9c;
+    }
+
+    & .volume-fill {
+        background: var(--accent);
+        box-shadow: none;
+    }
+
+    & .exit-progress-label {
+        color: var(--accent2);
+        letter-spacing: 0.06em;
+    }
+
+    & .exit-progress-track {
+        background: #141a33;
+        border: 2px solid var(--accent2);
+        border-radius: 0;
+    }
+
+    & .exit-progress-fill {
+        background: var(--accent2);
+        box-shadow: none;
+    }
+
+    & .exit-label {
+        letter-spacing: 0.04em;
+        color: var(--text);
+        text-shadow: 3px 3px 0 var(--bg);
+        background: rgba(11, 16, 33, 0.7);
+    }
+}

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60" shape-rendering="crispEdges">
+  <!-- Pixel-art focus ring around the "Games" card icon.
+       A Bresenham circle (r=14, solid 2x2 squares, 72 cells) — not a plain CSS
+       border-radius:50%, but a genuinely stepped, 8-bit circle outline, like the
+       pixel font of the carousel-peek arrows. A thinner line + a finer (more, smaller
+       cells) outline than the first version (r=7, 4x4 cells, 36 of them).
+       The styles/*.css .card.focused .card-icon::after (pulse-ring keyframe: scale
+       0.9→1.1→0.9 + opacity) still RUNS on this image too — only the shape/material
+       of the ring changes, not the pulsing. -->
+  <g fill="#f6c945">
+    <rect x="1" y="29" width="2" height="2"/>
+    <rect x="3" y="21" width="2" height="2"/>
+    <rect x="3" y="23" width="2" height="2"/>
+    <rect x="3" y="25" width="2" height="2"/>
+    <rect x="3" y="27" width="2" height="2"/>
+    <rect x="3" y="31" width="2" height="2"/>
+    <rect x="3" y="33" width="2" height="2"/>
+    <rect x="3" y="35" width="2" height="2"/>
+    <rect x="3" y="37" width="2" height="2"/>
+    <rect x="5" y="17" width="2" height="2"/>
+    <rect x="5" y="19" width="2" height="2"/>
+    <rect x="5" y="39" width="2" height="2"/>
+    <rect x="5" y="41" width="2" height="2"/>
+    <rect x="7" y="15" width="2" height="2"/>
+    <rect x="7" y="43" width="2" height="2"/>
+    <rect x="9" y="13" width="2" height="2"/>
+    <rect x="9" y="45" width="2" height="2"/>
+    <rect x="11" y="11" width="2" height="2"/>
+    <rect x="11" y="47" width="2" height="2"/>
+    <rect x="13" y="9" width="2" height="2"/>
+    <rect x="13" y="49" width="2" height="2"/>
+    <rect x="15" y="7" width="2" height="2"/>
+    <rect x="15" y="51" width="2" height="2"/>
+    <rect x="17" y="5" width="2" height="2"/>
+    <rect x="17" y="53" width="2" height="2"/>
+    <rect x="19" y="5" width="2" height="2"/>
+    <rect x="19" y="53" width="2" height="2"/>
+    <rect x="21" y="3" width="2" height="2"/>
+    <rect x="21" y="55" width="2" height="2"/>
+    <rect x="23" y="3" width="2" height="2"/>
+    <rect x="23" y="55" width="2" height="2"/>
+    <rect x="25" y="3" width="2" height="2"/>
+    <rect x="25" y="55" width="2" height="2"/>
+    <rect x="27" y="3" width="2" height="2"/>
+    <rect x="27" y="55" width="2" height="2"/>
+    <rect x="29" y="1" width="2" height="2"/>
+    <rect x="29" y="57" width="2" height="2"/>
+    <rect x="31" y="3" width="2" height="2"/>
+    <rect x="31" y="55" width="2" height="2"/>
+    <rect x="33" y="3" width="2" height="2"/>
+    <rect x="33" y="55" width="2" height="2"/>
+    <rect x="35" y="3" width="2" height="2"/>
+    <rect x="35" y="55" width="2" height="2"/>
+    <rect x="37" y="3" width="2" height="2"/>
+    <rect x="37" y="55" width="2" height="2"/>
+    <rect x="39" y="5" width="2" height="2"/>
+    <rect x="39" y="53" width="2" height="2"/>
+    <rect x="41" y="5" width="2" height="2"/>
+    <rect x="41" y="53" width="2" height="2"/>
+    <rect x="43" y="7" width="2" height="2"/>
+    <rect x="43" y="51" width="2" height="2"/>
+    <rect x="45" y="9" width="2" height="2"/>
+    <rect x="45" y="49" width="2" height="2"/>
+    <rect x="47" y="11" width="2" height="2"/>
+    <rect x="47" y="47" width="2" height="2"/>
+    <rect x="49" y="13" width="2" height="2"/>
+    <rect x="49" y="45" width="2" height="2"/>
+    <rect x="51" y="15" width="2" height="2"/>
+    <rect x="51" y="43" width="2" height="2"/>
+    <rect x="53" y="17" width="2" height="2"/>
+    <rect x="53" y="19" width="2" height="2"/>
+    <rect x="53" y="39" width="2" height="2"/>
+    <rect x="53" y="41" width="2" height="2"/>
+    <rect x="55" y="21" width="2" height="2"/>
+    <rect x="55" y="23" width="2" height="2"/>
+    <rect x="55" y="25" width="2" height="2"/>
+    <rect x="55" y="27" width="2" height="2"/>
+    <rect x="55" y="31" width="2" height="2"/>
+    <rect x="55" y="33" width="2" height="2"/>
+    <rect x="55" y="35" width="2" height="2"/>
+    <rect x="55" y="37" width="2" height="2"/>
+    <rect x="57" y="29" width="2" height="2"/>
+  </g>
+</svg>

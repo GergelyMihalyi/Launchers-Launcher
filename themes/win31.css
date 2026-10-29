@@ -1,0 +1,279 @@
+/* "Windows 3.1" theme — grey bevels, teal desktop, navy title bars, no glow/scanline. An additive override above styles/*.css, every rule
+   nested under :root[data-theme="win31"] (native CSS nesting) — only live with <html data-theme="win31">. "Decorative animations off" comes
+   from the manifest's `motion: "off"` field (the global :root[data-motion="off"] * rule in styles/*.css) — no separate animation kill here. */
+
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap');
+
+:root[data-theme="win31"] {
+    --bg: #008080;
+    /* teal desktop */
+    --surface: #c0c0c0;
+    /* grey panel */
+    --accent: #000080;
+    /* navy — focus / title bar */
+    --accent2: #a00000;
+    --text: #000000;
+    --dim: #4a4a4a;
+    --running: #008000;
+    /* classic VGA green ("● RUNNING" badge) */
+
+    --font-body: 'Tahoma', 'MS Sans Serif', 'Segoe UI', sans-serif;
+    --font-display: 'Silkscreen', 'Tahoma', sans-serif;
+
+    /* Flat: the focus is only a thin navy border (the .card.focused bevel comes from a separate rule). */
+    --focus-shadow: 0 0 0 2px var(--accent);
+    --focus-shadow-danger: 0 0 0 2px var(--accent2);
+
+    --scanline-opacity: 0;
+    --ambient: var(--bg);
+    --card-radius: 0;
+    --card-border: 2px solid var(--w31-shadow);
+    --corner-decor: none;
+    --card-bg-opacity: 0;
+    /* a flat grey panel — no blurred background icon */
+
+    --w31-face: #c0c0c0;
+    --w31-light: #ffffff;
+    --w31-shadow: #808080;
+    --w31-dark: #000000;
+
+    & .header h1 {
+        font-weight: 700;
+        font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+        letter-spacing: normal;
+        background: none;
+        -webkit-text-fill-color: var(--w31-light);
+        filter: drop-shadow(2px 2px 0 var(--w31-dark));
+    }
+
+    & .header .sub {
+        letter-spacing: 0.1em;
+        color: #d8d8d8;
+    }
+
+    /* Card = window: a raised bevel (light left/top, dark right/bottom). The radius/base border come from tokens; here the 4-value bevel
+           border-color + the inner 1px lines. */
+    & .card {
+        /* The per-launcher accent (carousel inline --card-accent) is ignored — a monochrome bevel aesthetic. */
+        --card-accent: var(--accent) !important;
+        border-color: var(--w31-light) var(--w31-shadow) var(--w31-shadow) var(--w31-light);
+        background: var(--w31-face);
+        box-shadow: inset -1px -1px 0 var(--w31-dark), inset 1px 1px 0 var(--w31-face);
+    }
+
+    & .card.focused {
+        border-color: var(--w31-light) var(--w31-shadow) var(--w31-shadow) var(--w31-light);
+        box-shadow: inset -1px -1px 0 var(--w31-dark), inset 1px 1px 0 var(--w31-face);
+        outline: 2px dotted var(--w31-dark);
+        outline-offset: -6px;
+    }
+
+    /* Card name = title bar */
+    & .card-name {
+        font-weight: 700;
+        font-size: clamp(0.8rem, 1.185vh, 2rem);
+        letter-spacing: normal;
+        color: var(--text);
+        padding: 3px 10px;
+    }
+
+    & .card.focused .card-name {
+        background: var(--accent);
+        color: var(--w31-light);
+    }
+
+    & .card-hint {
+        color: var(--dim);
+        letter-spacing: normal;
+    }
+
+    & .card.focused .card-icon svg {
+        filter: none;
+    }
+
+    & .card .press-hint {
+        color: var(--text);
+        letter-spacing: normal;
+    }
+
+    & .card.focused .app-icon {
+        filter: none;
+    }
+
+    /* Taskbar */
+    & .bottom-bar {
+        background: var(--w31-face);
+        border-top: 2px solid var(--w31-light);
+        box-shadow: inset 0 1px 0 var(--w31-shadow);
+        color: var(--text);
+        letter-spacing: normal;
+    }
+
+    & .btn-icon {
+        border-radius: 0;
+        border-width: 2px;
+        border-style: solid;
+        border-color: var(--w31-light) var(--w31-shadow) var(--w31-shadow) var(--w31-light);
+        background: var(--w31-face);
+        color: var(--text);
+        font-family: 'Tahoma', sans-serif;
+    }
+
+    & .status {
+        color: var(--w31-light);
+        letter-spacing: 0.1em;
+    }
+
+    & .status.error {
+        color: #ffd0d0;
+    }
+
+    /* Settings icon + panel = windows */
+    & .settings-icon-btn {
+        border-radius: 0;
+        border-width: 2px;
+        border-style: solid;
+        border-color: var(--w31-light) var(--w31-shadow) var(--w31-shadow) var(--w31-light);
+        background: var(--w31-face);
+    }
+
+    & .settings-icon-btn svg {
+        fill: var(--text);
+    }
+
+    & .settings-icon-btn .audio-current-name {
+        color: var(--text);
+    }
+
+    & .settings-overlay {
+        background: rgba(0, 0, 0, 0.35);
+    }
+
+    & .settings-panel {
+        border-radius: 0;
+        border-width: 2px;
+        border-style: solid;
+        border-color: var(--w31-light) var(--w31-shadow) var(--w31-shadow) var(--w31-light);
+        background: var(--w31-face);
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    & .settings-panel-title {
+        font-size: 0.7rem;
+        letter-spacing: normal;
+        color: var(--w31-light);
+        background: var(--accent);
+        padding: 4px 6px;
+        text-align: left;
+    }
+
+    & .settings-list {
+        background: var(--w31-light);
+        border: 2px solid;
+        border-color: var(--w31-shadow) var(--w31-light) var(--w31-light) var(--w31-shadow);
+        padding: 4px;
+    }
+
+    & .settings-item {
+        border-radius: 0;
+        border: 1px solid transparent;
+        background: var(--w31-light);
+        color: var(--text);
+        letter-spacing: normal;
+    }
+
+    & .settings-item.focused {
+        border-color: transparent;
+        background: var(--accent);
+        color: var(--w31-light);
+    }
+
+    & .settings-item.grabbed {
+        border: 1px dotted var(--w31-light);
+        background: var(--accent);
+        color: var(--w31-light);
+        transform: none;
+    }
+
+    & .settings-item.focused .bt-icon,
+    & .settings-item.focused .bt-disamb,
+    & .settings-item.focused .audio-current-tag,
+    & .settings-item.focused .tag-warn {
+        color: var(--w31-light);
+    }
+
+    & .settings-subhead {
+        color: var(--text);
+        letter-spacing: normal;
+    }
+
+    & .settings-item-readonly {
+        opacity: 0.6;
+    }
+
+    & .settings-panel-hint {
+        color: var(--text);
+        letter-spacing: normal;
+    }
+
+    /* Overlays */
+    & .loading-overlay {
+        background: var(--bg);
+    }
+
+    & .loading-text {
+        color: var(--w31-light);
+        letter-spacing: normal;
+    }
+
+    & .volume-overlay {
+        border-radius: 0;
+        border-width: 2px;
+        border-style: solid;
+        border-color: var(--w31-light) var(--w31-shadow) var(--w31-shadow) var(--w31-light);
+        background: var(--w31-face);
+    }
+
+    & .volume-label {
+        color: var(--text);
+        letter-spacing: normal;
+    }
+
+    & .volume-track {
+        border-radius: 0;
+        background: var(--w31-shadow);
+        border: 1px solid var(--w31-dark);
+    }
+
+    & .volume-fill {
+        background: var(--accent);
+        box-shadow: none;
+    }
+
+    & .volume-percent {
+        color: var(--text);
+    }
+
+    & .exit-progress-label {
+        color: var(--w31-light);
+        letter-spacing: normal;
+    }
+
+    & .exit-progress-track {
+        background: var(--w31-shadow);
+        border: 1px solid var(--w31-dark);
+    }
+
+    & .exit-progress-fill {
+        background: var(--accent2);
+        box-shadow: none;
+    }
+
+    & .exit-label {
+        font-size: clamp(1.4rem, 4vw, 2.6rem);
+        letter-spacing: normal;
+        color: var(--w31-light);
+        text-shadow: 2px 2px 0 var(--w31-dark);
+        background: rgba(0, 128, 128, 0.85);
+    }
+}

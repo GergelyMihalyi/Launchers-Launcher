@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" shape-rendering="crispEdges">
+  <!-- Pixel-art JRPG world-map scene as the background of the "Pixel RPG" theme.
+       Built from right-angled rectangles only (no curves / anti-aliasing-prone shapes) - this gives
+       the "blocky" pixel-art look, and it stays sharp at any resolution (vector).
+       themes/pixel-rpg.css layers a darkening gradient over it in .bg-glow for the legibility of the
+       card hints, following the pattern of xp-bliss.jpg. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1021"/>
+      <stop offset="0.6" stop-color="#141a33"/>
+      <stop offset="1" stop-color="#1c2444"/>
+    </linearGradient>
+    <pattern id="stars" width="240" height="220" patternUnits="userSpaceOnUse">
+      <rect x="18" y="24" width="4" height="4" fill="#e8e4d0" opacity="0.8"/>
+      <rect x="96" y="60" width="4" height="4" fill="#f6c945" opacity="0.7"/>
+      <rect x="160" y="18" width="4" height="4" fill="#e8e4d0" opacity="0.6"/>
+      <rect x="60" y="120" width="4" height="4" fill="#e8e4d0" opacity="0.5"/>
+      <rect x="200" y="140" width="4" height="4" fill="#f6c945" opacity="0.6"/>
+      <rect x="140" y="90" width="4" height="4" fill="#e8e4d0" opacity="0.4"/>
+    </pattern>
+    <g id="tree">
+      <rect x="-3" y="10" width="6" height="16" fill="#241407"/>
+      <rect x="-15" y="-6" width="30" height="16" fill="#173318"/>
+      <rect x="-11" y="-17" width="22" height="13" fill="#1f4420"/>
+      <rect x="-6" y="-26" width="12" height="11" fill="#2a5a2a"/>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#sky)"/>
+  <rect x="0" y="0" width="1920" height="700" fill="url(#stars)"/>
+
+  <!-- distant mountain range (stepped "pixel-staircase" silhouette) -->
+  <path d="M0,760 H80 V700 H160 V760 H240 V640 H320 V700 H400 V600 H480 V680 H560 V620 H640 V700
+           H720 V640 H800 V760 H880 V680 H960 V600 H1040 V660 H1120 V720 H1200 V640 H1280 V700
+           H1360 V600 H1440 V680 H1520 V760 H1600 V700 H1680 V640 H1760 V700 H1840 V760 H1920 V1080 H0 Z"
+        fill="#232c52"/>
+
+  <!-- nearer mountain range, darker -->
+  <path d="M0,820 H120 V760 H240 V840 H360 V700 H480 V780 H600 V680 H720 V800 H840 V720 H960 V820
+           H1080 V740 H1200 V800 H1320 V700 H1440 V780 H1560 V820 H1680 V760 H1800 V800 H1920 V1080 H0 Z"
+        fill="#171d3a"/>
+
+  <rect x="0" y="840" width="1920" height="60" fill="#0d1122"/>
+  <rect x="0" y="900" width="1920" height="180" fill="#080b18"/>
+
+  <!-- dirt road to the castle gate -->
+  <polygon points="860,1080 878,1020 892,980 905,940 915,900 925,860 935,840
+                    985,840 995,860 1008,900 1022,940 1038,980 1055,1020 1075,1080"
+           fill="#6b5636"/>
+  <rect x="900" y="960" width="14" height="10" fill="#7f6a44" opacity="0.6"/>
+  <rect x="1000" y="900" width="12" height="10" fill="#7f6a44" opacity="0.6"/>
+  <rect x="930" y="1020" width="16" height="10" fill="#57451f" opacity="0.6"/>
+
+  <!-- castle silhouette -->
+  <g fill="#0a0e1e">
+    <rect x="820" y="620" width="70" height="220"/>
+    <rect x="828" y="600" width="54" height="20"/>
+    <rect x="838" y="584" width="34" height="16"/>
+    <rect x="848" y="572" width="14" height="12"/>
+
+    <rect x="1030" y="640" width="70" height="200"/>
+    <rect x="1038" y="620" width="54" height="20"/>
+    <rect x="1048" y="604" width="34" height="16"/>
+    <rect x="1058" y="592" width="14" height="12"/>
+
+    <rect x="880" y="680" width="160" height="160"/>
+    <rect x="880" y="664" width="16" height="16"/>
+    <rect x="912" y="664" width="16" height="16"/>
+    <rect x="944" y="664" width="16" height="16"/>
+    <rect x="976" y="664" width="16" height="16"/>
+    <rect x="1008" y="664" width="16" height="16"/>
+    <rect x="940" y="800" width="40" height="40"/>
+  </g>
+  <g fill="#f6c945" opacity="0.85">
+    <rect x="845" y="700" width="12" height="16"/>
+    <rect x="1055" y="712" width="12" height="16"/>
+    <rect x="932" y="740" width="16" height="20"/>
+  </g>
+
+  <!-- trees along the road -->
+  <use href="#tree" x="760" y="912"/>
+  <use href="#tree" x="700" y="952"/>
+  <use href="#tree" x="1150" y="908"/>
+  <use href="#tree" x="1212" y="948"/>
+  <use href="#tree" x="640" y="1000"/>
+  <use href="#tree" x="1268" y="998"/>
+  <use href="#tree" x="480" y="1040"/>
+  <use href="#tree" x="1420" y="1032"/>
+  <use href="#tree" x="200" y="1060"/>
+  <use href="#tree" x="1680" y="1055"/>
+</svg>

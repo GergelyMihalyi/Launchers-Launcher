@@ -1,0 +1,164 @@
+/* "Nintendo" theme — colorful, cheerful, rounded. An additive override above styles/*.css; every rule is nested under
+   :root[data-theme="nintendo"] (native CSS nesting), so it only applies when <html> has data-theme="nintendo". Most of the structural switch
+   comes from tokens (font / focus-shadow / scanline / ambient / card-radius / card-border / corner-decor); only truly unique rules remain as
+   selector overrides. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+:root[data-theme="nintendo"] {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --accent: #e60012;
+    /* Nintendo red */
+    --accent2: #0ab6e6;
+    /* cheerful blue */
+    --text: #2b2b33;
+    --dim: #9aa0a6;
+    --running: #1a8f3c;
+    /* green readable on a light background ("● RUNNING" badge) */
+
+    --font-body: 'Fredoka', 'Trebuchet MS', sans-serif;
+    --font-display: 'Fredoka', sans-serif;
+
+    --focus-shadow: 0 10px 26px color-mix(in srgb, var(--focus-glow-color) 18%, transparent);
+    --focus-shadow-danger: 0 10px 26px rgba(230, 0, 18, 0.28);
+
+    --scanline-opacity: 0;
+    --ambient:
+        radial-gradient(ellipse 70% 50% at 50% 0%, #ffe1e4 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 15% 90%, rgba(10, 182, 230, 0.12) 0%, transparent 60%);
+    --card-radius: 28px;
+    --card-border: 3px solid #e8eaf0;
+    --corner-decor: none;
+    --card-bg-opacity: 0.1;
+    /* light theme: lower, so it is not "dirty" on the white panel */
+
+    & .header h1 {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        background: none;
+        -webkit-text-fill-color: var(--accent);
+        filter: drop-shadow(0 3px 0 rgba(230, 0, 18, 0.2));
+    }
+
+    & .header .sub {
+        letter-spacing: 0.3em;
+        color: var(--accent2);
+    }
+
+    /* Round "Switch" cards: the border/radius comes from tokens, only the resting shadow here. */
+    & .card {
+        box-shadow: 0 6px 18px rgba(43, 43, 51, 0.08);
+    }
+
+    /* Next to the token-based outer glow of .card.focused, styles/*.css also adds a faint cyan inset layer - removed on a light theme (only the
+           soft red glow). */
+    & .card.focused {
+        box-shadow: var(--focus-shadow);
+    }
+
+    & .card.focused .app-icon {
+        filter: grayscale(0%) brightness(1) drop-shadow(0 6px 10px color-mix(in srgb, var(--card-accent, var(--accent)) 30%, transparent));
+    }
+
+    & .card.focused .card-icon::after {
+        border-color: var(--accent2);
+    }
+
+    & .card-name {
+        font-weight: 600;
+        letter-spacing: 0.06em;
+    }
+
+    /* Bottom bar + status */
+    & .bottom-bar {
+        background: linear-gradient(to top, rgba(244, 246, 251, 0.98), transparent);
+    }
+
+    & .btn-icon {
+        font-family: 'Fredoka', sans-serif;
+        border-radius: 50%;
+    }
+
+    & .btn-x,
+    & .btn-triangle {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+
+    & .btn-ps,
+    & .btn-square {
+        background: var(--accent2);
+        color: #fff;
+        border-color: var(--accent2);
+    }
+
+    /* Settings icon + panel */
+    & .settings-icon-btn {
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid #e8eaf0;
+        border-radius: 14px;
+    }
+
+    & .settings-overlay {
+        background: rgba(43, 43, 51, 0.45);
+    }
+
+    & .settings-panel {
+        border: 3px solid #e8eaf0;
+        border-radius: 22px;
+        box-shadow: 0 20px 50px rgba(43, 43, 51, 0.25);
+    }
+
+    & .settings-panel-title {
+        letter-spacing: 0.1em;
+    }
+
+    & .settings-item {
+        border: 2px solid #eceef3;
+        border-radius: 14px;
+        background: #fafbfd;
+    }
+
+    & .settings-item.focused {
+        background: rgba(230, 0, 18, 0.06);
+    }
+
+    & .settings-item.grabbed {
+        border-color: var(--accent);
+        background: rgba(230, 0, 18, 0.12);
+    }
+
+    & .settings-subhead {
+        color: var(--accent2);
+    }
+
+    & .settings-item.focused .tag-warn {
+        color: var(--accent);
+    }
+
+    & .volume-overlay {
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid #e8eaf0;
+        border-radius: 16px;
+    }
+
+    & .volume-track {
+        background: rgba(230, 0, 18, 0.15);
+    }
+
+    & .volume-fill {
+        box-shadow: none;
+    }
+
+    & .exit-progress-fill {
+        box-shadow: none;
+    }
+
+    & .exit-label {
+        color: var(--accent);
+        text-shadow: none;
+        background: rgba(255, 255, 255, 0.7);
+    }
+}

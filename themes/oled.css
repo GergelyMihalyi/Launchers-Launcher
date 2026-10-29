@@ -1,0 +1,53 @@
+/* "OLED (black)" (oled) theme — a true #000 base, minimal chrome, no permanently bright element (no scanline, ambient or glow); only a thin
+   whitish border marks the focus. OLED burn-in friendly + a "night / movie" mood — the same logic as the idle screensaver. An additive
+   override above styles/*.css, every rule nested under :root[data-theme="oled"] — only live with <html data-theme="oled">. Font: the neon
+   base's (Orbitron + Share Tech Mono), no extra @import. */
+
+:root[data-theme="oled"] {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --accent: #e8e8e8;
+    /* whitish — no colored light source */
+    --accent2: #9a9a9a;
+    --text: #cfcfcf;
+    --dim: #565656;
+    --running: #6fbf8f;
+    /* faint green, not glowing */
+
+    /* Only a thin border, no glow. */
+    --focus-shadow: 0 0 0 1px var(--accent);
+    --focus-shadow-danger: 0 0 0 1px var(--accent2);
+
+    --scanline-opacity: 0;
+    --ambient: #000000;
+    --card-radius: 4px;
+    --card-border: 1px solid #1c1c1c;
+    --corner-decor: none;
+    --card-bg-opacity: 0;
+    /* no permanently bright element on the #000 base */
+
+    & .header h1 {
+        background: none;
+        -webkit-text-fill-color: var(--text);
+        filter: none;
+    }
+
+    /* The per-launcher accent (carousel inline --card-accent) is ignored — a monochrome, burn-in friendly aesthetic. */
+    & .card {
+        --card-accent: var(--accent) !important;
+    }
+
+    /* The colored glow of the focused icon is removed (styles/*.css: drop-shadow var(--accent)). */
+    & .card.focused .card-icon svg {
+        filter: none;
+    }
+
+    & .card.focused .app-icon {
+        filter: none;
+    }
+
+    /* The pulsing ring stays (motion is OLED-friendly), but faintly — not a permanent light. */
+    & .card.focused .card-icon::after {
+        opacity: 0.2;
+    }
+}

@@ -1,0 +1,208 @@
+/* styles/07-screen-overlays.css — System button icons, TV-mode exit, volume overlay, screensaver, global error overlay.
+   The styles/NN-*.css files load in NUMERIC ORDER in index.html (test/contracts/css-links.test.js). */
+/* "System" buttons (Share/View = Settings, Options/Menu = quick system menu) — a neutral color, they must not compete with the colors of
+   the action buttons (accent/accent2). */
+.btn-view,
+.btn-start {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--dim);
+    border: 1px solid var(--dim);
+}
+
+/* TV-mode exit (hold Circle for 5 s) feedback */
+.exit-progress {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+.exit-progress.visible {
+    opacity: 1;
+}
+
+.exit-progress-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--accent2);
+    text-transform: uppercase;
+}
+
+.exit-progress-track {
+    width: clamp(200px, 26vh, 460px);
+    height: clamp(4px, 0.5vh, 10px);
+    background: rgba(255, 61, 110, 0.15);
+    overflow: hidden;
+}
+
+.exit-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent2);
+    box-shadow: var(--focus-shadow-danger);
+}
+
+.exit-label {
+    position: fixed;
+    inset: 0;
+    z-index: 220;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    text-shadow: var(--focus-shadow-danger);
+    background: rgba(4, 4, 10, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.exit-label.visible {
+    opacity: 1;
+}
+
+/* Volume overlay (L1/R1) */
+.volume-overlay {
+    position: fixed;
+    bottom: clamp(80px, 9vh, 200px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+    padding: 0.65em 1.25em;
+    background: rgba(13, 13, 26, 0.85);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+.volume-overlay.visible {
+    opacity: 1;
+}
+
+.volume-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    text-transform: uppercase;
+}
+
+.volume-track {
+    width: clamp(160px, 21vh, 380px);
+    height: clamp(6px, 0.7vh, 14px);
+    background: rgba(0, 229, 255, 0.15);
+    overflow: hidden;
+    border-radius: 3px;
+}
+
+.volume-fill {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: var(--focus-shadow);
+    transition: width 0.1s ease;
+}
+
+.volume-percent {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 2.6em;
+    text-align: right;
+}
+
+/* Idle screensaver (see renderer/home/idle.js) - a fully black, energy-saving background with the spinning, bouncing icons of the active
+   launchers (OLED-friendly - no static content). pointer-events: none, so a future mouse/touch input is not blocked. overflow: hidden for
+   safety (the icon position is already clamped to the bounds in JS). */
+.idle-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: #000;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
+.idle-overlay.visible {
+    opacity: 1;
+}
+
+/* The position/rotation comes from attractTick() of renderer/home/idle.js (inline transform, like the carousel cards - a class would not
+   work because of the higher specificity of the theme CSS). */
+.attract-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 64px;
+    height: 64px;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.12));
+}
+
+/* Discreet bouncing clock next to the spinning icons (renderer/home/idle.js spawnAttractClock). The overlay is always #000, hence a fixed
+   faint white (not a theme token). It does not rotate -> the transform is translate only. The `vh`-clamp size is consistent with the 4K
+   scaling. */
+.attract-clock {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 9vh, 8rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.14);
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* Software brightness + night mode (renderer/settings/settings-screen-filter.js): ABOVE the screensaver (300), BELOW the fatal error
+   overlay (400). `pointer-events: none` — without it nothing would be clickable. JS sets the opacity (0 = no effect). */
+.screen-filter {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.screen-filter-night {
+    z-index: 350;
+    background: #ff8a2a;
+    mix-blend-mode: multiply;
+}
+
+.screen-filter-dim {
+    z-index: 351;
+    background: #000;
+}
+
+/* Global error overlay (renderer/errors.js) - the layout/visibility toggle comes from the INLINE style in index.html (failsafe: readable
+   even if this file did not load). Only refinement here: the border of the error text box + the letters from the theme font. */
+.fatal-overlay {
+    font-family: var(--font-body, system-ui, sans-serif);
+}
+
+.fatal-overlay-message:not(:empty) {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    text-align: left;
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Launchers Launcher">
+<rect width="240" height="240" rx="52" fill="#0E1120"/>
+<g transform="translate(18 6) scale(.85)">
+<path d="M106 196 Q120 240 134 196 Q120 206 106 196 Z" fill="#FF7A1A"/>
+<path d="M112 196 Q120 222 128 196 Q120 201 112 196 Z" fill="#FFC94A"/>
+<path d="M120 22 C134 36 140 56 140 76 L140 110 L182 110 Q190 110 190 118 L190 142 Q190 150 182 150 L140 150 L140 184 Q140 192 132 192 L108 192 Q100 192 100 184 L100 150 L58 150 Q50 150 50 142 L50 118 Q50 110 58 110 L100 110 L100 76 C100 56 106 36 120 22 Z" fill="#E9ECF5"/>
+<circle cx="120" cy="130" r="9" fill="#0E1120"/>
+<path d="M68 121 L59 130 L68 139 Z" fill="#0E1120"/>
+<path d="M172 121 L181 130 L172 139 Z" fill="#0E1120"/>
+<path d="M111 176 L120 184 L129 176 Z" fill="#0E1120"/>
+<circle cx="120" cy="78" r="11" fill="#39C6E8"/>
+<circle cx="120" cy="78" r="5" fill="#0E1120"/>
+</g>
+</svg>

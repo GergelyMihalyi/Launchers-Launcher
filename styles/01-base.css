@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+/* styles/01-base.css — Base: design tokens (:root), motion/contrast/UI-scale modes, the dynamic root font size, html/body, scanline,
+   background layers. The styles/NN-*.css files load in NUMERIC ORDER in index.html (test/contracts/css-links.test.js). */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #04040a;
+    --surface: #0d0d1a;
+    --accent: #00e5ff;
+    --accent2: #ff3d6e;
+    --text: #c8d8e8;
+    --dim: #4a5568;
+
+    /* Font families - themes ONLY set these 2 tokens, not font-family per selector. (.btn-icon deliberately hardcodes Orbitron - because of
+           the flex-center glyph alignment, see there.) */
+    --font-body: 'Share Tech Mono', monospace;
+    --font-display: 'Orbitron', sans-serif;
+
+    /* Focus glow as a FULL box-shadow / text-shadow value (not a color). Flat theme: e.g. 0 0 0 2px var(--accent). --focus-glow-color is
+           the glow's COLOR (default: --accent) — the carousel puts a per-launcher --card-accent on the focused card, which the .card rule routes
+           here. The flat themes (win31/oled) do not build --focus-shadow from this color, so the per-launcher glow is skipped for them
+           automatically. */
+    --focus-glow-color: var(--accent);
+    --focus-shadow: 0 0 20px color-mix(in srgb, var(--focus-glow-color) 40%, transparent), 0 0 60px color-mix(in srgb, var(--focus-glow-color) 15%, transparent);
+    --focus-shadow-danger: 0 0 20px rgba(255, 61, 110, 0.5);
+
+    /* Structural switches - a theme switches with these, not with selector overrides. */
+    --scanline-opacity: 0.08;
+    /* CRT scanline strength; 0 = invisible (no display:none needed) */
+    --ambient:
+        radial-gradient(ellipse 60% 40% at 50% 50%, rgba(0, 40, 80, 0.6) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 50% at 20% 80%, rgba(0, 229, 255, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 50% at 80% 20%, rgba(255, 61, 110, 0.04) 0%, transparent 60%);
+    --card-radius: 4px;
+    --card-border: 1px solid rgba(0, 229, 255, 0.1);
+    --corner-decor: block;
+    /* .card corner decoration (::before/::after); none = off */
+    --card-bg-opacity: 0.16;
+    /* blurred launcher icon as the card background;
+           0 = off (flat/monochrome themes) */
+
+    /* color of the "● RUNNING" badge on the card of an already running launcher - themes override it */
+    --running: #2fe57e;
+}
+
+/* "Decorative animations off" (manifest `motion: "off"` OR Settings → Accessibility → Animations = OFF; applyMotionPref() sets
+   <html data-motion="off">). */
+:root[data-motion="off"] * {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* High contrast mode (Settings → Accessibility → High contrast; applyContrastPref() sets <html data-contrast="high">). Theme-INDEPENDENT:
+   pulls secondary text toward `--text` (works on light AND dark themes, since it is relative), turns off contrast-reducing decorations,
+   strengthens borders + the focus marking. */
+:root[data-contrast="high"] {
+    --dim: color-mix(in srgb, var(--text) 68%, var(--dim));
+    --card-bg-opacity: 0;
+    --scanline-opacity: 0;
+    --card-border: 1px solid color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+:root[data-contrast="high"] .card.focused {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+:root[data-contrast="high"] .settings-item.focused,
+:root[data-contrast="high"] .game-cell.focused,
+:root[data-contrast="high"] .recent-game.focused {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Dynamic base font size: EVERY rem-based size (Settings / Games panel, bottom bar, overlays, tips, toast) scales with the screen HEIGHT
+   - twice as big on a 4K TV (2160 CSS px high) as on a 1080p-high display. The same `vh` principle as the cards: the two displays used on
+   the machine are exactly 1080 and 2160 high, so plain `vh` is enough. 1.481vh @1080 = 16px (the browser default, so nothing changes on
+   the existing displays), @2160 = 32px. The carousel's `vh` clamps do NOT double: their middle term is `vh`, rem is only the min/max end. */
+/* Manual UI scale (Settings → Appearance → UI size; `uiScale` config): the `--ui-scale` multiplier only affects the `rem`-based surface
+   (Settings/Games panel, bottom bar, overlays, tips, toast). It does NOT affect the carousel's `vh`-clamped card size. */
+:root { --ui-scale: 1; }
+:root[data-ui-scale="small"] { --ui-scale: 0.88; }
+:root[data-ui-scale="large"] { --ui-scale: 1.15; }
+html {
+    font-size: calc(clamp(15px, 1.481vh, 34px) * var(--ui-scale));
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow: hidden;
+    cursor: none;
+}
+
+/* CRT scanline overlay */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: repeating-linear-gradient(0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, var(--scanline-opacity)) 2px,
+            rgba(0, 0, 0, var(--scanline-opacity)) 4px);
+    pointer-events: none;
+}
+
+/* Ambient background */
+.bg-glow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: var(--ambient);
+}
+
+/* Custom / built-in background image layer ABOVE .bg-glow (same z-index, the DOM order paints it on top). Hidden by default — `.active`
+   only when the `background` config is not none. */
+#bgCustom {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: none;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+#bgCustom.active {
+    display: block;
+}
+
+/* Mandatory scrim for the readability of the card hints / peek arrows (like over the xp Bliss). Fixed strength — tuned for the dark base
+   themes. */
+#bgCustom.active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(6, 10, 18, 0.45) 0%, rgba(6, 10, 18, 0.62) 100%);
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    /* Room for the fixed-position .bottom-bar - --bottom-bar-h is measured by renderer/main.js (ResizeObserver on #bottomBar), the 90px is
+           only the fallback before the first paint (before the JS measurement). Without it the bottom edge of the recent-bar/continue-bar would
+           slide under the bar at some monitor heights. */
+    padding-bottom: var(--bottom-bar-h, 90px);
+    gap: 0;
+}
+
+/* Screen readers only (#srAnnounce): takes no visible space. */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}

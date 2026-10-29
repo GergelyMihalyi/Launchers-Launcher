@@ -1,0 +1,44 @@
+name: Bug report
+description: Something does not work on your machine
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! The log helps most. **Look through it before attaching** — it can contain file paths and Wi-Fi names.
+        Security problems: please use the private reporting described in SECURITY.md instead.
+  - type: input
+    id: version
+    attributes:
+      label: Launcher version
+      description: Settings → System → Diagnostics
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Distro, desktop, session
+      description: "For example: Fedora 44 · KDE Plasma · Wayland (`/etc/os-release`, `echo $XDG_CURRENT_DESKTOP $XDG_SESSION_TYPE`)"
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: GPU, controller, TV
+      description: "For example: AMD RX 7800 XT · DualSense · LG C2 over HDMI-CEC"
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: "Settings → System → Log → □ (export), or `~/.local/share/launchers-launcher.log`. Paste the relevant lines or attach the file."
+      render: text

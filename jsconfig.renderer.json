@@ -1,0 +1,25 @@
+{
+    "//": "Build-free type checking of the renderer (renderer/**/*.js) — `npm run typecheck` / `test/contracts/typecheck.test.js`. The renderer files are classic <script src>s sharing ONE global scope: TS treats them as global scripts too (hence the `module.exports` guard is `Object.assign(module.exports, …)` and the guarded require is `module.require(…)` — TS does not see these as module markers). The type of `window.launcher` comes from preload.js `api` (renderer/globals.d.ts).",
+    "compilerOptions": {
+        "checkJs": true,
+        "allowJs": true,
+        "noEmit": true,
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "target": "es2022",
+        "lib": [
+            "es2023",
+            "dom",
+            "dom.iterable"
+        ],
+        "types": [],
+        "strict": false,
+        "noUnusedLocals": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "renderer/**/*.js",
+        "renderer/globals.d.ts"
+    ]
+}

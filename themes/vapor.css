@@ -1,0 +1,35 @@
+/* "Vaporwave" (vapor) theme — a sunset gradient (pink → purple → cyan), a grid horizon in the background, a double (pink + cyan) focus
+   glow. An additive override, every rule nested under :root[data-theme="vapor"]. Font: the neon base's (no @import). */
+
+:root[data-theme="vapor"] {
+    --bg: #1a0b2e;
+    --surface: #2d1b4e;
+    --accent: #ff71ce;
+    /* hot pink */
+    --accent2: #05d9e8;
+    /* cyan */
+    --text: #f5e6ff;
+    --dim: #9d7bb5;
+    --running: #7bf1a8;
+
+    --focus-shadow: 0 0 22px color-mix(in srgb, var(--focus-glow-color) 45%, transparent), 0 0 55px color-mix(in srgb, #05d9e8 20%, transparent);
+    --focus-shadow-danger: 0 0 22px color-mix(in srgb, #ff4f9d 45%, transparent);
+
+    --scanline-opacity: 0.06;
+    /* A sunset glow at the top + vertical grid lines (retro "grid horizon"). */
+    --ambient:
+        linear-gradient(180deg, rgba(255, 113, 206, 0.22) 0%, rgba(139, 90, 205, 0.12) 38%, transparent 68%),
+        repeating-linear-gradient(90deg, transparent, transparent 58px, rgba(5, 217, 232, 0.06) 58px, rgba(5, 217, 232, 0.06) 60px),
+        #1a0b2e;
+    --card-radius: 6px;
+    --card-border: 1px solid rgba(255, 113, 206, 0.3);
+    --corner-decor: block;
+    --card-bg-opacity: 0.18;
+
+    & .header h1 {
+        background: linear-gradient(135deg, #ff71ce 0%, #c774e8 50%, #05d9e8 100%);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 22px rgba(255, 113, 206, 0.5));
+    }
+}

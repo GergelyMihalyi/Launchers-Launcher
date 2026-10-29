@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Launchers Launcher
+GenericName=Game Launcher
+Comment=Controller-friendly launcher for Steam, Heroic and RetroArch
+Exec=@REPO@/bin/launchers-launcher-show.sh
+Icon=@REPO@/assets/logo/logo.svg
+Terminal=false
+Categories=Game;
+Keywords=game;launcher;steam;retroarch;heroic;controller;
+StartupNotify=false
