@@ -8,6 +8,22 @@ users, so pre-1.0.0 history lives only in git.
 The running version is shown in **Settings → System → Diagnostics** and comes
 from `package.json`.
 
+## [1.1.1] - 2026-11-02
+
+### Fixed
+
+- **Startup audio:** when the TV's HDMI sink is not there yet at start-up, the launcher now waits for it in the background and
+  switches to it as soon as it appears, instead of staying on the previous output.
+- **Wayland socket:** the Wayland session is found by scanning the runtime folder when `wayland-0` does not exist (for example
+  `wayland-1`), so the right display platform is picked.
+- **Leaving TV mode:** restoring the desktop monitor is retried while the disabled monitor keeps flapping its hotplug line.
+
+### Changed
+
+- The README starts with a short personal introduction, and the README and the user guide were checked against the program:
+  supported native / flatpak variants, the wizard steps, the quick system menu settings, the Games panel sort button and the save
+  backup restore are now described.
+
 ## [1.1.0] - 2026-10-29
 
 ### Changed
@@ -185,5 +201,6 @@ The author's hardware only: Fedora KDE Plasma on Wayland, AMD GPU, an LG TV over
 HDMI-CEC, DualSense / DualShock / Xbox controllers. CEC behaviour in particular
 is vendor-specific.
 
-[Unreleased]: https://github.com/GergelyMihalyi/Launchers-Launcher/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/GergelyMihalyi/Launchers-Launcher/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/GergelyMihalyi/Launchers-Launcher/releases/tag/v1.1.1
 [1.1.0]: https://github.com/GergelyMihalyi/Launchers-Launcher/releases/tag/v1.1.0

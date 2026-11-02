@@ -4,7 +4,8 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { parseDesktopProfile, normalizeDisplayConfig, activeLayoutArgs } = require('../../lib/output/displays.js');
+const config = require('../../lib/config.js');
+const { parseDesktopProfile, normalizeDisplayConfig, activeLayoutArgs, restoreMonitors } = require('../../lib/output/displays.js');
 
 test('parseDesktopProfile — valid profile, disableOthers default true, pinned default false', () => {
     assert.deepEqual(parseDesktopProfile({ monitors: ['DP-3', 'DP-1'], sink: 'alsa_output.x' }), {
@@ -122,4 +123,48 @@ test('activeLayoutPlan — the same as activeLayoutArgs, in a DE-independent sha
     const mons = [{ name: 'DP-1' }, { name: 'DP-3' }, { name: 'HDMI-A-1' }];
     assert.deepEqual(activeLayoutPlan(['DP-3', 'DP-9', 'DP-1'], mons), { order: ['DP-3', 'DP-1'], disable: ['HDMI-A-1'] });
     assert.equal(activeLayoutPlan(['DP-9'], mons), null);
+});
+
+// --- restoreMonitors: re-checks while the saved monitor flaps its hotplug line ---
+
+const mon = (name) => ({ name, width: 3840, height: 2160, active: false, priority: 0, label: name });
+
+async function restoreWith({ lists, applyFails = 0 }) {
+    config.set('display', { monitor: 'DP-2', sink: null, desktop: { monitors: ['HDMI-A-1'], sink: null, disableOthers: true } });
+    const applied = [];
+    const lines = [];
+    let calls = 0;
+    let applyCalls = 0;
+    await restoreMonitors((m) => lines.push(m), {
+        list: async () => { const r = lists[Math.min(calls, lists.length - 1)]; calls += 1; return r; },
+        apply: async (plan) => { applyCalls += 1; if (applyCalls <= applyFails) throw new Error('output gone'); applied.push(plan); },
+        sleep: async () => {}, tries: 5, intervalMs: 1,
+    });
+    return { applied, lines, calls };
+}
+
+test('restoreMonitors — the saved monitor is connected at once → one switch, no retry', async () => {
+    const r = await restoreWith({ lists: [[mon('DP-2'), mon('HDMI-A-1')]] });
+    assert.deepEqual(r.applied, [{ order: ['HDMI-A-1'], disable: ['DP-2'] }]);
+    assert.equal(r.calls, 1);
+});
+
+test('restoreMonitors — the saved monitor is in a hotplug gap → retries until it is back', async () => {
+    const r = await restoreWith({ lists: [[mon('DP-2')], [mon('DP-2')], [mon('DP-2'), mon('HDMI-A-1')]] });
+    assert.deepEqual(r.applied, [{ order: ['HDMI-A-1'], disable: ['DP-2'] }]);
+    assert.equal(r.calls, 3);
+    assert.match(r.lines.at(-1), /after 3 attempt/);
+});
+
+test('restoreMonitors — never comes back → logged no-op that names what IS connected', async () => {
+    const r = await restoreWith({ lists: [[mon('DP-2')]] });
+    assert.deepEqual(r.applied, []);
+    assert.equal(r.calls, 5);
+    assert.match(r.lines.at(-1), /none of the saved monitors \(HDMI-A-1\) is connected after 5 check\(s\) \(connected now: DP-2\)/);
+});
+
+test('restoreMonitors — the switch itself fails once (output dropped meanwhile) → tried again', async () => {
+    const r = await restoreWith({ lists: [[mon('DP-2'), mon('HDMI-A-1')]], applyFails: 1 });
+    assert.equal(r.applied.length, 1);
+    assert.equal(r.calls, 2);
 });

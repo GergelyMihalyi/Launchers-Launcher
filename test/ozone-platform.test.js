@@ -36,6 +36,41 @@ for (const [name, env, paths, xDir, platform, display] of CASES) {
     });
 }
 
+// A compositor whose `wayland-0` is taken at login gets `wayland-1` (2026-11-02: the launcher fell to x11 and kscreen-doctor
+// saw no monitors, because only `wayland-0` was assumed).
+test('pickOzonePlatform — only wayland-1 exists, no WAYLAND_DISPLAY → wayland + the found name', () => {
+    const res = pickOzonePlatform({
+        env: { XDG_RUNTIME_DIR: RUN, DISPLAY: ':0' },
+        exists: (p) => p === `${RUN}/wayland-1`,
+        listDir: (d) => (d === RUN ? ['wayland-1', 'wayland-1.lock', 'bus'] : []),
+    });
+    assert.equal(res.platform, 'wayland');
+    assert.equal(res.waylandDisplay, 'wayland-1');
+    assert.match(res.reason, /wayland-1/);
+});
+
+test('pickOzonePlatform — several sockets: the lowest number; wayland-0 needs no extra name', () => {
+    const list = ['wayland-10', 'wayland-2', 'wayland-2.lock'];
+    const two = pickOzonePlatform({
+        env: { XDG_RUNTIME_DIR: RUN }, exists: (p) => p === `${RUN}/wayland-2` || p === `${RUN}/wayland-10`, listDir: (d) => (d === RUN ? list : []),
+    });
+    assert.equal(two.waylandDisplay, 'wayland-2');
+    const zero = pickOzonePlatform({
+        env: { XDG_RUNTIME_DIR: RUN }, exists: (p) => p === `${RUN}/wayland-0`, listDir: () => [],
+    });
+    assert.equal(zero.waylandDisplay, undefined);
+});
+
+test('pickOzonePlatform — an explicit WAYLAND_DISPLAY that does not exist is NOT replaced by a scan', () => {
+    const res = pickOzonePlatform({
+        env: { XDG_RUNTIME_DIR: RUN, WAYLAND_DISPLAY: 'wayland-5', DISPLAY: ':0' },
+        exists: (p) => p === `${RUN}/wayland-1`,
+        listDir: (d) => (d === RUN ? ['wayland-1'] : []),
+    });
+    assert.equal(res.platform, 'x11');
+    assert.equal(res.waylandDisplay, undefined);
+});
+
 test('waylandSocketPath — runtime dir + name / absolute / default', () => {
     assert.equal(waylandSocketPath({ XDG_RUNTIME_DIR: RUN }), `${RUN}/wayland-0`);
     assert.equal(waylandSocketPath({ XDG_RUNTIME_DIR: RUN, WAYLAND_DISPLAY: 'wayland-3' }), `${RUN}/wayland-3`);

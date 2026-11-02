@@ -33,14 +33,18 @@ this page records what differs per platform and what has been verified where.
 
 ## Wayland vs X11 (ozone)
 
-The Wayland **socket's existence** decides (`$WAYLAND_DISPLAY`, else `$XDG_RUNTIME_DIR/wayland-0`), then `DISPLAY` /
+The Wayland **socket's existence** decides (`$WAYLAND_DISPLAY`, else `$XDG_RUNTIME_DIR/wayland-0`, else the lowest `wayland-<n>`
+found in the runtime dir — `bin/start.js` then exports it as `WAYLAND_DISPLAY`, so Chromium, `kscreen-doctor` and spawned games
+all connect to it; `lib/exec.js` `sessionEnv` does the same for its fallback), then `DISPLAY` /
 `/tmp/.X11-unix/X*` → `x11` (and it fills a missing `DISPLAY`), nothing → `wayland`; `LAUNCHERS_LAUNCHER_OZONE=wayland|x11`
 overrides. **Never decide from `XDG_SESSION_TYPE`/`WAYLAND_DISPLAY`, never hard-code `--ozone-platform` in `package.json`**
 (on an X11 machine, e.g. GNOME on Xorg, that is an immediate SIGTRAP; `test/contracts/window-hardening.test.js` guards it).
 **Chromium picks the ozone platform before any JS runs**, so a `main.js` `appendSwitch('ozone-platform')` is too late (a
 watcher start with no environment chose x11 → `Missing X server or $DISPLAY` → SIGTRAP, 2026-09-29): `npm start` is
 `node bin/start.js`, which passes the decision as a CLI switch. Log: `[ozone] <platform> — <reason>`; Diagnostics → Graphical
-platform. The 11 September SIGSEGV was caused by the missing `ozone-platform=wayland`, not by the GPU.
+platform. **Never assume `wayland-0`** (2026-11-02: KWin got `wayland-1` for a whole boot; the launcher chose x11, and `kscreen-doctor`,
+pointed at the nonexistent `wayland-0`, saw no monitors — "Startup monitor (DP-2) is not connected", no TV switch, no desktop
+profile recorded). The 11 September SIGSEGV was caused by the missing `ozone-platform=wayland`, not by the GPU.
 
 ## Distros
 

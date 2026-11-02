@@ -120,7 +120,8 @@ On a launcher card, **□** (or a held **✕**) opens the card's menu:
 ### System menu (Options / Menu button)
 
 From anywhere on the home screen: **Power off**, **Restart**, **Sleep**, **Quit app**. The first three ask for **confirmation**
-(another ✕), because the machine carries them out immediately.
+(another ✕), because the machine carries them out immediately. At the top of the menu are a few quick settings — ✕ switches to the
+next value at once: the audio output (if there are several), the sleep timer, night mode and "do not disturb".
 
 ![The system menu](img/05-system-menu.jpg)
 
@@ -158,6 +159,7 @@ Lutris, RetroArch ROMs and the emulators' games.
 | △ | pin to the **favorites** (★ mark); press again to unpin |
 | □ | source filter: which sources appear in the ALL list |
 | L2 / R2 | switch the source · in the RetroArch list, jump by letter |
+| R3 (press the right stick) | change the sort order of the source (name / recently played / play time / recently added) |
 | Share / View | **search** |
 | Options / Menu | refresh — re-reads the game lists (e.g. after a new install) |
 | ○ | close the panel |
@@ -207,7 +209,7 @@ Opens with the **Share / View** button. On the left are the 8 categories, on the
 | Category | What you find in it |
 |---|---|
 | **Display & audio** | audio output · startup display & audio · displays & TV (CEC) · volume step and limit · brightness · night mode |
-| **Games** | grid or list · recently played bars · cover download · clear cache · ROM folder permissions · playtime · back up game saves |
+| **Games** | grid or list · recently played bars · cover download · clear cache · ROM folder permissions · playtime · play-time reminder · back up game saves |
 | **Launchers** | add / remove launchers · order · melonDS ROM folders |
 | **Controllers** | Bluetooth controllers · controls · Bluetooth audio devices · disconnect controllers when idle |
 | **Startup** | start on login · start on controller connect · main controller · close apps on TV mode · TV mode exit hold · always on top · do not disturb while playing |
@@ -277,7 +279,9 @@ for that long — it does not count during a game, and warns you a minute before
 ### Game saves
 
 **Games → Back up game saves**: makes a backup of the emulators' saves with one button press (by default into the
-`~/launchers-launcher-saves` folder; the last 5 are kept).
+`~/launchers-launcher-saves` folder, which you can change — an external drive works too; the last 5 are kept). The same screen can
+back up **automatically** (after a game, at most hourly, or daily) and **restore** an earlier backup: ✕ arms it, another ✕
+overwrites the current saves (a safety backup of the current state is made first, and a running game blocks it).
 
 ### Update
 
@@ -299,7 +303,7 @@ If the machine is set up that way (the installer offers it), **switching on the 
 monitor and audio setup, disconnects the controllers, puts the TV into standby (if you asked for that), and closes.
 
 > When you change the display in Settings, the launcher asks: **"Keep this display?"** If you do not answer (e.g. because no
-> picture appeared), it goes back by itself after a few seconds.
+> picture appeared), it goes back by itself after about 15 seconds.
 
 ---
 

@@ -16,6 +16,7 @@ const root = path.join(__dirname, '..');
 const ozone = pickOzonePlatform();
 const env = { ...process.env };
 if (ozone.display && !env.DISPLAY) env.DISPLAY = ozone.display;
+if (ozone.waylandDisplay && !env.WAYLAND_DISPLAY) env.WAYLAND_DISPLAY = ozone.waylandDisplay;
 
 const electronBin = /** @type {string} */ (/** @type {unknown} */ (require('electron')));
 const child = spawn(electronBin, [`--ozone-platform=${ozone.platform}`, root, ...process.argv.slice(2)],

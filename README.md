@@ -1,5 +1,27 @@
 <p align="center"><img src="assets/logo/logo-wordmark.svg" alt="Launchers Launcher" width="420"></p>
 
+This launcher was created because I'm lazy.
+
+I was too lazy to grab a mouse every time I wanted to launch a game from a different launcher.
+
+I was too lazy to turn on the TV, switch the audio output, and take care of all the other stuff every time I sat down in front of it.
+
+I was too lazy to look for the TV remote.
+
+I was too lazy to browse through my games in emulators that didn't have a library feature (melonDS).
+
+I was too lazy to search for my most recently played games in each emulator.
+
+I was too lazy to remember which launcher or emulator I needed to open.
+
+I was too lazy to write the code manually.
+
+All I wanted was to pick up my controller and play.
+
+And that's how the Launchers Launcher was born — out of pure laziness.
+
+---
+
 A full-screen, controller-navigable kiosk launcher for a living-room Linux PC.
 Built with Electron for **KDE Plasma (Wayland)** and **GNOME (X11 / Wayland)**. It
 launches Steam, Heroic (GOG/Epic/Amazon), RetroArch and a growing list of
@@ -9,7 +31,7 @@ desktop apps when a Bluetooth controller connects.
 
 ![The home screen](docs/user-guide/img/01-home.jpg)
 
-> **Status:** version 1, built for one living-room PC and tested on a few
+> **Status:** version 1.x, built for one living-room PC and tested on a few
 > machines (see [Limitations](#limitations)). It shells out to `kscreen-doctor`
 > (KDE) or Mutter's D-Bus API (GNOME), `pactl` (PipeWire / PulseAudio),
 > `bluetoothctl` and `gdbus`; expect to adjust connector names, sink names and
@@ -21,10 +43,12 @@ desktop apps when a Bluetooth controller connects.
 
 ## What it does
 
-- **Carousel launcher** — Steam / Heroic / RetroArch / custom entries, driven by a
+- **Carousel launcher** — Steam / Heroic / RetroArch / any app you add, driven by a
   gamepad (DualSense, DualShock, Xbox; keyboard fallback for testing).
-- **Game-level launching** — browse installed Steam and Heroic games and RetroArch
-  ROM playlists, launch a specific title (with cover art).
+- **Game-level launching** — one Games panel for installed Steam, Heroic and Lutris
+  games, RetroArch playlists and the libraries of Ryujinx, PCSX2, DuckStation,
+  PPSSPP, Dolphin, Cemu, RPCS3 and melonDS (plus custom ROM folders); launch a
+  specific title, with cover art, favourites and play time.
 - **TV mode** — on Bluetooth controller connect: close configured desktop apps,
   start the launcher, switch display + audio to the saved output, and power the
   TV on via CEC (only when the startup monitor *is* the TV).
@@ -60,9 +84,9 @@ Optional:
 | For | Need |
 | --- | --- |
 | TV power-on / volume over CEC | HDMI-CEC adapter (`/dev/cec*`), `cec-ctl` (from `v4l-utils`), `cec-toolbox`, and membership in the `video` group (`sudo usermod -aG video $USER`) |
-| Steam games | Steam installed natively (`~/.steam`) |
-| Heroic games | Heroic as **flatpak** (`com.heroicgameslauncher.hgl`) |
-| RetroArch ROMs | RetroArch as **flatpak** (`org.libretro.RetroArch`) with scanned playlists |
+| Steam games | Steam, native (`~/.steam`) or flatpak (`com.valvesoftware.Steam`) |
+| Heroic games | Heroic, native or flatpak (`com.heroicgameslauncher.hgl`) |
+| RetroArch ROMs | RetroArch, native or flatpak (`org.libretro.RetroArch`), with scanned playlists |
 
 Most desktop GPUs have **no** HDMI-CEC — the TV-control features simply stay
 hidden if no adapter is found.
@@ -107,8 +131,8 @@ in its own dialog, so a keyboard is needed for that step.
 
 Or just `npm install && npm start` and skip the installer.
 
-On first run a **setup wizard** walks you through startup monitor, audio sink,
-main controller and theme (every step skippable; re-run any time from **Settings
+On first run a **setup wizard** walks you through language, launchers, startup
+monitor, audio output, main controller, theme and the button layout (every step skippable; re-run any time from **Settings
 → System → Setup wizard**). It writes `~/.config/launchers-launcher/config.json`.
 
 Settings and the wizard are controller-driven; the keyboard fallback covers the
@@ -159,7 +183,7 @@ under your home directory:
 ~/.local/share/launchers-launcher-watcher.log     watcher log
 ~/.local/share/launchers-launcher-main-controller sidecar: the "main controller" MAC
 ~/.local/share/launchers-launcher-tvmode          sidecar: the tvMode close-list
-~/.local/share/launchers-launcher.lock            PID lock while the launcher runs
+~/.local/share/launchers-launcher.lock            written by the watcher while the launcher runs
 ~/launchers-launcher-saves/                       emulator save backups (Settings → Games → Back up game saves; folder configurable)
 ```
 
@@ -171,8 +195,9 @@ To wipe all state: `rm -rf ~/.config/launchers-launcher ~/.local/share/launchers
 **Settings → Games → Back up game saves** packs the emulators' save folders (memory cards, SAVEDATA,
 save states — RetroArch, PCSX2, DuckStation, PPSSPP, Dolphin, Cemu, Ryujinx, RPCS3, melonDS) into
 one `launchers-launcher-saves-<date>.tar.zst` (`.tar.gz` without `zstd`) in a folder you choose —
-an external drive works too. The last 5 are kept. Restore from a terminal (this overwrites the
-current saves): `tar -xf launchers-launcher-saves-<date>.tar.zst -C /`.
+an external drive works too. The last 5 are kept. The same screen can back up automatically (after a
+game or daily) and restores a chosen backup (a safety backup of the current saves is made first).
+From a terminal (this overwrites the current saves): `tar -xf launchers-launcher-saves-<date>.tar.zst -C /`.
 
 ### Custom covers
 
@@ -196,7 +221,7 @@ Everything lives in `~/.config/launchers-launcher/config.json`:
 | Key | What to change |
 | --- | --- |
 | `display` | Connector names (`DP-1`, `HDMI-A-1`, …) and the audio sink name are the author's. Set yours via **Settings → Display & audio → Startup display & audio**; the desktop-restore profile is auto-captured on first launch. |
-| `tvMode` | Apps to close when TV mode starts + pre-commands. Empty by default — the shipped example closes Chrome/Spotify/VS Code and runs two Docker `down` commands. `closeFlatpak` = flatpak app IDs, `closeNative` = exact process names, `preCommands` = shell strings run with `bash -lc`. |
+| `tvMode` | Apps to close when TV mode starts + pre-commands. Empty by default. Flatpak apps are picked in **Settings → Startup → Close apps on TV mode**; the other two lists are edited by hand. `closeFlatpak` = flatpak app IDs, `closeNative` = exact process names, `preCommands` = shell strings run with `bash -lc`. |
 | `mainController` | Which paired controller may trigger the launcher. Set via **Settings → Startup → Main controller**; empty = any controller. |
 | `display.tvIsStartupMonitor` | `true` forces the CEC power-on at launch instead of relying on the connector match (for AVR pass-through or an always-on TV). |
 | `display.cecTarget` | CEC logical address for volume/mute/power (default `0` = TV; `5` = an AVR / soundbar "Audio System"). |
@@ -221,10 +246,11 @@ If you get it working on another TV, a PR adding a row is welcome.
 
 No build step, no bundler, no framework.
 
-- `main.js` — Electron main process (window, IPC, spawning).
-- `lib/*.js` — all the I/O logic (parsers, config, launcher discovery, audio /
-  displays / Bluetooth, launch state machine). No `electron` import — unit-testable.
-- `renderer/*.js` — the UI, plain `<script src>` files sharing one global scope.
+- `main.js` — Electron main process (wires the services together; window, IPC, lifecycle).
+- `lib/**` — all the I/O logic, grouped by area (`ipc/`, `launchers/`, `launch/`,
+  `output/`, …: parsers, config, launcher discovery, audio / displays / Bluetooth,
+  launch state machine). No `electron` import — unit-testable.
+- `renderer/**` — the UI, plain `<script src>` files sharing one global scope.
 - `docs/dev/` — the developer documentation: architecture, per-module notes and
   the many hardware gotchas found along the way (start at [docs/dev/README.md](docs/dev/README.md)).
 

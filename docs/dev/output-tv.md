@@ -75,7 +75,13 @@ attempt after the TV's CEC wake-up). With `keepOthers` the window is moved as we
 `pactl` with `LC_ALL=C`** (otherwise field names are `Név:`/`Leírás:` and parsing silently yields an
 empty list). The default sink is addressed as `@DEFAULT_SINK@`; volume is stored per sink by
 PipeWire, so a different percentage after switching device is expected. `applyStartupSink` is a
-logged no-op for a sink that is not present. `changeVolume(delta)` steps with the `volumeMax` ceiling
+logged no-op for a sink that is not present (returns `false`). **The TV's HDMI sink only exists once the TV is awake** — after the
+CEC power-on that is seconds *after* the launcher started (2026-11-02: three of ten starts logged `Startup audio device … is
+unavailable` right after `TV power-on over CEC`, ~70 ms apart, and the sound stayed on the old device). So
+`applyStartupOutputs` follows a `false` with `waitForStartupSink` **in the background** (re-checks every
+`STARTUP_SINK_POLL_MS` × `STARTUP_SINK_POLL_TRIES`, 1 s × 30; the window does not wait for it) and switches as soon as the
+sink appears. It gives up if the *default* sink changed meanwhile while the target is still absent (the user chose something
+else — never override that). It polls whether or not CEC was used (the TV may be switched on with the remote too). `changeVolume(delta)` steps with the `volumeMax` ceiling
 (`stepVolume`); the renderer supplies the step size in `delta`.
 
 ## CEC
@@ -115,7 +121,11 @@ cannot answer the password prompt). Three independent best-effort steps run with
 
 - **Monitors** (`restoreMonitors`): from `display.desktop.monitors` only — connected outputs listed
   there get `enable` + `priority.<i+1>`; if none of the saved monitors is connected → no-op (the
-  screen must not go dark); `disableOthers` (default true) disables connected outputs not in the list
+  screen must not go dark) **— but only after re-checking for ~4 s** (`MONITOR_RESTORE_RETRY_MS` × `…_TRIES`). A monitor the
+  launcher itself disabled can flap its hotplug line: the ultrawide on HDMI-A-1 disconnects/reconnects roughly every 5 s while it
+  gets no signal (journal: `Removing connected display on bus 5` / `Adding connected display` from powerdevil, 2026-11-02), and
+  the first TV-mode exit landed in the ~1 s gap → `none of the saved monitors is connected`, desktop left on the TV. A switch that
+  fails because the output dropped between query and apply is retried too. The final no-op line names what *was* connected; `disableOthers` (default true) disables connected outputs not in the list
   (typically the TV). **No hard-coded connector fallback**: no `desktop` profile → logged no-op.
 - **Audio** (`restoreDesktopAudio`): from `desktop.sink` only; missing → logged no-op.
   `resolveDesktopSink` matches the exact sink name, or — when device numbering shifted because the
